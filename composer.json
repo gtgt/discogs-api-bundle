@@ -1,0 +1,49 @@
+{
+    "name": "tamas-gere/discogs-api-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony Bundle providing a complete API client for Discogs.com v2.0 with OAuth 1.0a support",
+    "keywords": ["discogs", "api", "client", "symfony", "bundle", "oauth"],
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "symfony/http-client": "^8.0",
+        "symfony/dependency-injection": "^8.0",
+        "symfony/config": "^8.0",
+        "symfony/event-dispatcher": "^8.0",
+        "symfony/framework-bundle": "^8.0",
+        "symfony/http-foundation": "^8.0",
+        "symfony/routing": "^8.0",
+        "symfony/serializer": "^8.0",
+        "symfony/cache": "^8.0",
+        "league/oauth1-client": "^1.10"
+    },
+    "require-dev": {
+        "symfony/test-pack": "^8.0",
+        "symfony/maker-bundle": "^8.0",
+        "phpunit/phpunit": "^10.0",
+        "phpstan/phpstan": "^1.10",
+        "friendsofphp/php-cs-fixer": "^3.14"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tamash\\DiscogsApiBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tamash\\DiscogsApiBundle\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "bundle": true
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "symfony/flex": true
+        }
+    }
+}

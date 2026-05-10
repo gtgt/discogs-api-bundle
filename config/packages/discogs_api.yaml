@@ -1,0 +1,36 @@
+discogs_api:
+    user_agent: 'MyDiscogsApp/1.0'  # Required - change to your app name/version
+    base_url: 'https://api.discogs.com'
+    timeout: 30
+
+    # Choose ONE authentication method:
+
+    # Option 1: Simple user token (for personal scripts)
+    user_token:
+        token: '%env(DISCOGS_USER_TOKEN)%'
+
+    # Option 2: OAuth 1.0a (for multi-user apps)
+    oauth1:
+        consumer_key: '%env(DISCOGS_CONSUMER_KEY)%'
+        consumer_secret: '%env(DISCOGS_CONSUMER_SECRET)%'
+        token: '%env(DISCOGS_TOKEN)%'        # optional - stored access token
+        token_secret: '%env(DISCOGS_TOKEN_SECRET)%'  # optional - stored token secret
+        callback_url: 'http://your-app/oauth/callback'
+
+    # Optional features
+    cache:
+        enabled: false
+        pool: 'cache.app'
+        ttl:
+            artists: 3600     # 1 hour
+            releases: 1800    # 30 minutes
+            masters: 3600     # 1 hour
+            labels: 3600      # 1 hour
+            collection: 300   # 5 minutes
+            wantlist: 300     # 5 minutes
+            marketplace: 60   # 1 minute
+
+    enable_rate_limit_header: true
+    retry_on_rate_limit: false
+    max_retries: 3
+    dispatch_events: false

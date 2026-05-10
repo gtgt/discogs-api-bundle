@@ -1,0 +1,27 @@
+# Composer dependencies
+/vendor/
+
+# Symfony
+/var/
+/public/build/
+
+# IDE
+.idea/
+.phpunit.result.cache
+/.phpunit.cache
+.php-cs-fixer.cache
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files with secrets (local only)
+.env.local
+.env.*.local
+
+# Test coverage
+/coverage/
+/coverage.xml
+
+# Logs
+*.log

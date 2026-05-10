@@ -1,0 +1,5 @@
+# Test routes
+controllers:
+    resource: '../vendor/tamas-gere/discogs-api-bundle/src/Controller/'
+    type: annotation
+    tags: ['controller.service_arguments']

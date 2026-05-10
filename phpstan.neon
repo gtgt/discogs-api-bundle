@@ -1,0 +1,12 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    excludePaths:
+        - src/DependencyInjection/Configuration.php  # dynamic config
+    checkMissingIterableValueType: false
+    reportUnmatchedIgnoredErrors: false
+
+includes:
+    - vendor/phpstan/phpstan/conf/bleak.neon
+    - vendor/phpstan/phpstan-shim/conf/phpstan-shim.neon
