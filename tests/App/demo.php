@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Demo script showing Discogs API Bundle usage in a standalone Symfony app
@@ -13,15 +13,15 @@ declare(strict_types=1);
  * - Valid DISCOGS_USER_TOKEN or OAuth credentials in .env
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
+use DiscogsApiBundle\Client\DiscogsClient;
+use DiscogsApiBundle\DependencyInjection\DiscogsApiExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Tamash\DiscogsApiBundle\DiscogsApiBundle;
-use Tamash\DiscogsApiBundle\Client\DiscogsClient;
 
 // Build container
 $container = new ContainerBuilder();
-$container->registerExtension(new DiscogsApiBundle());
+$container->registerExtension(new DiscogsApiExtension());
 $container->loadFromExtension('discogs_api', [
     'user_agent' => 'DiscogsDemo/1.0',
     'user_token' => [
@@ -32,6 +32,7 @@ $container->loadFromExtension('discogs_api', [
         'consumer_secret' => getenv('DISCOGS_CONSUMER_SECRET') ?: '',
     ],
 ]);
+$container->setParameter('kernel.environment', 'test');
 $container->compile();
 
 // Get client

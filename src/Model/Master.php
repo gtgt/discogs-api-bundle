@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Model;
-
-use Tamash\DiscogsApiBundle\Model\AbstractModel;
+namespace DiscogsApiBundle\Model;
 
 class Master extends AbstractModel
 {
@@ -23,13 +21,14 @@ class Master extends AbstractModel
         public readonly ?string $coverImage = null,
         public readonly ?string $resourceUrl = null,
         public readonly ?array $mainRelease = null,
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {
         return new self(
-            id: (int)$data['id'],
-            title: (string)$data['title'],
+            id: (int) $data['id'],
+            title: (string) $data['title'],
             description: self::getStringOrNull($data, 'description'),
             dataQuality: self::getStringOrNull($data, 'data_quality'),
             year: self::getIntOrNull($data, 'year'),

@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Model\Marketplace;
+namespace DiscogsApiBundle\Model\Marketplace;
 
-use Tamash\DiscogsApiBundle\Model\AbstractModel;
+use DiscogsApiBundle\Model\AbstractModel;
 
 class Listing extends AbstractModel
 {
@@ -27,28 +27,29 @@ class Listing extends AbstractModel
         public readonly ?string $expires,
         public readonly ?int $shipsWithin,
         public readonly array $images = [],
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {
         return new self(
-            id: (int)$data['id'],
+            id: (int) $data['id'],
             releaseInfo: $data['release'] ?? null,
-            status: (string)$data['status'],
-            price: (float)$data['price'],
-            currency: (string)$data['currency'],
-            condition: (string)$data['condition'],
+            status: (string) $data['status'],
+            price: (float) $data['price'],
+            currency: (string) $data['currency'],
+            condition: (string) $data['condition'],
             sleeveCondition: self::getStringOrNull($data, 'sleeve_condition'),
             comments: self::getStringOrNull($data, 'comments'),
-            allowOffers: (bool)($data['allow_offers'] ?? false),
+            allowOffers: (bool) ($data['allow_offers'] ?? false),
             seller: self::getStringOrNull($data, 'seller'),
             location: self::getStringOrNull($data, 'location'),
-            weight: isset($data['weight']) ? (float)$data['weight'] : null,
-            formatQuantity: isset($data['format_quantity']) ? (int)$data['format_quantity'] : null,
+            weight: isset($data['weight']) ? (float) $data['weight'] : null,
+            formatQuantity: isset($data['format_quantity']) ? (int) $data['format_quantity'] : null,
             externalId: self::getStringOrNull($data, 'external_id'),
             posted: self::getStringOrNull($data, 'posted'),
             expires: self::getStringOrNull($data, 'expires'),
-            shipsWithin: isset($data['ships_within']) ? (int)$data['ships_within'] : null,
+            shipsWithin: isset($data['ships_within']) ? (int) $data['ships_within'] : null,
             images: $data['images'] ?? [],
         );
     }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tamash\DiscogsApiBundle\Tests\Unit\Model;
+namespace DiscogsApiBundle\Tests\Unit\Model;
 
-use Tamash\DiscogsApiBundle\Model\Artist;
+use DiscogsApiBundle\Model\Artist;
 use PHPUnit\Framework\TestCase;
 
 class ArtistTest extends TestCase

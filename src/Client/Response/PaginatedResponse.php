@@ -1,8 +1,8 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Client\Response;
+namespace DiscogsApiBundle\Client\Response;
 
 use ArrayIterator;
 use Countable;
@@ -11,12 +11,19 @@ use IteratorAggregate;
 class PaginatedResponse implements IteratorAggregate, Countable
 {
     private array $items;
+
     private int $page;
+
     private int $pages;
+
     private int $perPage;
+
     private ?string $nextPageUrl;
+
     private ?string $prevPageUrl;
+
     private ?string $firstPageUrl;
+
     private ?string $lastPageUrl;
 
     public function __construct(

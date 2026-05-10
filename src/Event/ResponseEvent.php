@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Event;
+namespace DiscogsApiBundle\Event;
 
-use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ResponseEvent extends Event
 {

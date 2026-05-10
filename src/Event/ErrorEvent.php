@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Event;
+namespace DiscogsApiBundle\Event;
 
-use Tamash\DiscogsApiBundle\Exception\DiscogsApiException;
+use DiscogsApiBundle\Exception\DiscogsApiException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class ErrorEvent extends Event

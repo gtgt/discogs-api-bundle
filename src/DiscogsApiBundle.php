@@ -1,12 +1,12 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle;
+namespace DiscogsApiBundle;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use DiscogsApiBundle\DependencyInjection\DiscogsApiExtension;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
-use Tamash\DiscogsApiBundle\DependencyInjection\DiscogsApiExtension;
 
 class DiscogsApiBundle extends AbstractBundle
 {
@@ -15,7 +15,7 @@ class DiscogsApiBundle extends AbstractBundle
         return \dirname(__DIR__);
     }
 
-    public function getContainerExtension(): ?DiscogsApiExtension
+    public function getContainerExtension(): ?ExtensionInterface
     {
         return new DiscogsApiExtension();
     }

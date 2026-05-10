@@ -1,9 +1,8 @@
 <?php
+namespace DiscogsApiBundle\Tests\Integration;
 
-namespace Tamash\DiscogsApiBundle\Tests\Integration;
-
-use Tamash\DiscogsApiBundle\Tests\Integration\IntegrationTestCase;
-use Tamash\DiscogsApiBundle\Client\DiscogsClient;
+use DiscogsApiBundle\Tests\Integration\IntegrationTestCase;
+use DiscogsApiBundle\Client\DiscogsClient;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('live')]

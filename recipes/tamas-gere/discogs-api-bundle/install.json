@@ -1,5 +1,5 @@
 {
     "bundles": {
-        "Tamash\\\\DiscogsApiBundle\\\\DiscogsApiBundle": ["all"]
+        "\\DiscogsApiBundle\\\\DiscogsApiBundle": ["all"]
     }
 }

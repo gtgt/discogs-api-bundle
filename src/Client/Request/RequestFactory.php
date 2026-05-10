@@ -1,24 +1,27 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Client\Request;
+namespace DiscogsApiBundle\Client\Request;
 
-use Tamash\DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Client\Response\PaginatedResponse;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class RequestFactory
 {
     public static function createPaginatedResponse(array $data, ResponseInterface $response): PaginatedResponse
     {
-        $page = (int)($data['pagination']['page'] ?? 1);
-        $pages = (int)($data['pagination']['pages'] ?? 1);
-        $perPage = (int)($data['pagination']['per_page'] ?? count($data));
+        $page = (int) ($data['pagination']['page'] ?? 1);
+        $pages = (int) ($data['pagination']['pages'] ?? 1);
+        $perPage = (int) ($data['pagination']['per_page'] ?? count($data['releases'] ?? $data['artists'] ?? $data['results'] ?? []));
         $nextPageUrl = $data['pagination']['urls']['next'] ?? null;
         $prevPageUrl = $data['pagination']['urls']['previous'] ?? null;
 
+        // Determine items key based on data structure
+        $items = $data['releases'] ?? $data['artists'] ?? $data['results'] ?? [];
+
         return new PaginatedResponse(
-            $data,
+            $items,
             $page,
             $pages,
             $perPage,

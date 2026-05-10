@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Model\Community;
+namespace DiscogsApiBundle\Model\Community;
 
-use Tamash\DiscogsApiBundle\Model\AbstractModel;
+use DiscogsApiBundle\Model\AbstractModel;
 
 class Rating extends AbstractModel
 {
@@ -12,14 +12,15 @@ class Rating extends AbstractModel
         public readonly ?float $average,
         public readonly int $count,
         public readonly ?int $userRating,
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {
         return new self(
-            average: isset($data['average']) ? (float)$data['average'] : null,
-            count: (int)$data['count'],
-            userRating: isset($data['rating']) ? (int)$data['rating'] : null,
+            average: isset($data['average']) ? (float) $data['average'] : null,
+            count: (int) $data['count'],
+            userRating: isset($data['rating']) ? (int) $data['rating'] : null,
         );
     }
 }

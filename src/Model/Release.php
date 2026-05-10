@@ -1,10 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Model;
+namespace DiscogsApiBundle\Model;
 
-use Tamash\DiscogsApiBundle\Model\AbstractModel;
+use DiscogsApiBundle\Model\Community\ReleaseCommunity;
+use DiscogsApiBundle\Model\Community\Stats;
 
 class Release extends AbstractModel
 {
@@ -20,7 +21,7 @@ class Release extends AbstractModel
         public readonly array $styles = [],
         public readonly array $labels = [],
         public readonly array $artists = [],
-        public readonly ?array $master = null,
+        public readonly ?Master $master = null,
         public readonly ?string $mainReleaseId = null,
         public readonly array $formats = [],
         public readonly ?int $formatQuantity = null,
@@ -34,18 +35,18 @@ class Release extends AbstractModel
         public readonly ?array $identifiers = null,
         public readonly ?array $tracklist = null,
         public readonly ?array $extraArtists = null,
-        public readonly ?array $notes = null,
-        public readonly ?array $releaseData = null,
-        public readonly ?array $community = null,
-        public readonly ?array $statistics = null,
+        public readonly ?string $notes = null,
+        public readonly ?ReleaseCommunity $community = null,
+        public readonly ?Stats $statistics = null,
         public readonly ?string $resourceUrl = null,
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {
         return new self(
-            id: (int)$data['id'],
-            title: (string)$data['title'],
+            id: (int) $data['id'],
+            title: (string) $data['title'],
             description: self::getStringOrNull($data, 'description'),
             dataQuality: self::getStringOrNull($data, 'data_quality'),
             year: self::getIntOrNull($data, 'year'),
@@ -55,7 +56,7 @@ class Release extends AbstractModel
             styles: $data['styles'] ?? [],
             labels: $data['labels'] ?? [],
             artists: $data['artists'] ?? [],
-            master: $data['master'] ?? null,
+            master: isset($data['master']) ? Master::fromArray($data['master']) : null,
             mainReleaseId: $data['main_release'] ?? null,
             formats: $data['formats'] ?? [],
             formatQuantity: self::getIntOrNull($data, 'format_quantity'),
@@ -70,9 +71,8 @@ class Release extends AbstractModel
             tracklist: $data['tracklist'] ?? null,
             extraArtists: $data['extraartists'] ?? null,
             notes: $data['notes'] ?? null,
-            releaseData: $data['released'] ?? null,
-            community: $data['community'] ?? null,
-            statistics: $data['stats'] ?? null,
+            community: isset($data['community']) ? ReleaseCommunity::fromArray($data['community']) : null,
+            statistics: isset($data['stats']) ? Stats::fromArray($data['stats']) : null,
             resourceUrl: self::getStringOrNull($data, 'resource_url'),
         );
     }

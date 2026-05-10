@@ -3,14 +3,14 @@
 namespace DiscogsApiBundle\Tests\Unit\Service;
 
 use DiscogsApiBundle\Tests\Unit\UnitTestCase;
-use DiscogsApiBundle\Service\ReleaseService;
-use DiscogsApiBundle\Model\Release;
+use DiscogsApiBundle\Service\LabelService;
+use DiscogsApiBundle\Model\Label;
 use DiscogsApiBundle\Client\Request\RequestHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class ReleaseServiceTest extends UnitTestCase
+class LabelServiceTest extends UnitTestCase
 {
     private HttpClientInterface&MockObject $httpClient;
     private RequestHandler $requestHandler;
@@ -29,15 +29,15 @@ class ReleaseServiceTest extends UnitTestCase
         );
     }
 
-    public function testGetRelease(): void
+    public function testGetLabel(): void
     {
         $data = [
-            'id' => 12345,
-            'title' => 'Test Album',
-            'year' => 2024,
-            'country' => 'US',
-            'genres' => ['Rock'],
-            'labels' => [['name' => 'Test Label']],
+            'id' => 999,
+            'name' => 'Test Label',
+            'profile' => 'A test label',
+            'profileviews' => 1234,
+            'sublabels' => [],
+            'urls' => ['http://example.com'],
         ];
 
         $response = $this->createMock(ResponseInterface::class);
@@ -50,29 +50,32 @@ class ReleaseServiceTest extends UnitTestCase
 
         $this->httpClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'https://api.discogs.com/releases/12345', [
-                'headers' => ['User-Agent' => 'test-agent']
-            ])
+            ->with('GET', 'https://api.discogs.com/labels/999', ['headers' => ['User-Agent' => 'test-agent'], 'query' => []])
             ->willReturn($response);
 
-        $service = new ReleaseService($this->requestHandler);
+        $service = new LabelService($this->requestHandler);
 
-        $release = $service->getRelease(12345);
+        $label = $service->getLabel(999);
 
-        $this->assertInstanceOf(Release::class, $release);
-        $this->assertSame(12345, $release->id);
-        $this->assertSame('Test Album', $release->title);
-        $this->assertSame(2024, $release->year);
-        $this->assertContains('Rock', $release->genres);
+        $this->assertInstanceOf(Label::class, $label);
+        $this->assertSame(999, $label->id);
+        $this->assertSame('Test Label', $label->name);
+        $this->assertSame(1234, $label->profileViews);
     }
 
-    public function testGetReleaseStats(): void
+    public function testGetLabelReleases(): void
     {
         $data = [
-            'in_collection' => 100,
-            'in_wantlist' => 50,
-            'haves' => 80,
-            'wants' => 20,
+            'pagination' => [
+                'page' => 1,
+                'pages' => 2,
+                'per_page' => 20,
+                'urls' => [],
+            ],
+            'releases' => [
+                ['id' => 1, 'title' => 'Release 1'],
+                ['id' => 2, 'title' => 'Release 2'],
+            ],
         ];
 
         $response = $this->createMock(ResponseInterface::class);
@@ -85,16 +88,16 @@ class ReleaseServiceTest extends UnitTestCase
 
         $this->httpClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'https://api.discogs.com/releases/12345/stats', [
-                'headers' => ['User-Agent' => 'test-agent']
-            ])
+            ->with('GET', 'https://api.discogs.com/labels/999/releases', ['headers' => ['User-Agent' => 'test-agent'], 'query' => []])
             ->willReturn($response);
 
-        $service = new ReleaseService($this->requestHandler);
+        $service = new LabelService($this->requestHandler);
 
-        $stats = $service->getReleaseStats(12345);
+        $paginated = $service->getLabelReleases(999);
 
-        $this->assertSame(100, $stats['in_collection']);
-        $this->assertSame(50, $stats['in_wantlist']);
+        $this->assertCount(2, $paginated);
+        $this->assertSame(1, $paginated->getPage());
+        $this->assertSame(2, $paginated->getPages());
+        $this->assertSame('Release 1', $paginated->getItems()[0]['title']);
     }
 }

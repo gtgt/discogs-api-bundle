@@ -34,7 +34,6 @@ return $config->setRules([
         'not_operator_with_successor_space' => true,
         'ordered_imports' => true,
         'php_unit_method_casing' => ['case' => 'snake_case'],
-        'php_unit_test_annotation' => true,
         'phpdoc_indent' => true,
         'phpdoc_no_access' => true,
         'phpdoc_no_package' => true,
@@ -48,5 +47,4 @@ return $config->setRules([
         'trailing_comma_in_multiline' => true,
     ])
     ->setFinder($finder)
-    ->setRisksAllowed(true)
 ;

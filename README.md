@@ -29,7 +29,7 @@ For manual registration, add to `config/bundles.php`:
 ```php
 return [
     // ...
-    Tamash\DiscogsApiBundle\DiscogsApiBundle::class => ['all' => true],
+    DiscogsApiBundle\DiscogsApiBundle::class => ['all' => true],
 ];
 ```
 
@@ -144,7 +144,7 @@ Routes:
 Inject any service individually:
 
 ```php
-use Tamash\DiscogsApiBundle\Service\ArtistService;
+use DiscogsApiBundle\Service\ArtistService;
 
 public function __construct(private ArtistService $artistService) {}
 
@@ -187,7 +187,7 @@ if ($paginated->hasNextPage()) {
 All API errors throw exceptions:
 
 ```php
-use Tamash\DiscogsApiBundle\Exception\{
+use DiscogsApiBundle\Exception\{
     DiscogsApiException,
     RateLimitException,
     AuthenticationException,
@@ -230,7 +230,7 @@ Cache keys are auto-purged on write operations (add/remove collection, create/up
 Subscribe to events for logging/metrics:
 
 ```php
-use Tamash\DiscogsApiBundle\Event\{
+use DiscogsApiBundle\Event\{
     RequestBeforeEvent,
     ResponseEvent,
     ErrorEvent,

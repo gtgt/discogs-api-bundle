@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Model;
-
-use Tamash\DiscogsApiBundle\Model\AbstractModel;
+namespace DiscogsApiBundle\Model;
 
 class Artist extends AbstractModel
 {
@@ -22,14 +20,15 @@ class Artist extends AbstractModel
         public readonly array $urls = [],
         public readonly array $nameVariations = [],
         public readonly ?array $images = null,
-        public readonly ?array $dataQuality = null,
-    ) {}
+        public readonly ?string $dataQuality = null,
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {
         return new self(
-            id: (int)$data['id'],
-            name: (string)$data['name'],
+            id: (int) $data['id'],
+            name: (string) $data['name'],
             realname: self::getStringOrNull($data, 'realname'),
             profile: self::getStringOrNull($data, 'profile'),
             profileViews: self::getIntOrNull($data, 'profileviews'),

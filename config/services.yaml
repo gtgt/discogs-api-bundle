@@ -1,0 +1,39 @@
+parameters:
+
+services:
+    # Default configuration for services
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        bind:
+            $baseUrl: '%discogs_api.config.base_url%'
+
+    # Authenticator factory
+    discogs_api.authenticator:
+        class: DiscogsApiBundle\DependencyInjection\AuthenticatorFactory
+        factory: ['DiscogsApiBundle\DependencyInjection\AuthenticatorFactory', 'create']
+        arguments:
+            $config: '%discogs_api.config%'
+
+    # Alias for AuthenticatorInterface
+    DiscogsApiBundle\Client\Authenticator\AuthenticatorInterface: '@discogs_api.authenticator'
+
+    # Request Handler with optional caching
+    DiscogsApiBundle\Client\Request\RequestHandler:
+        arguments:
+            $httpClient: '@Symfony\Contracts\HttpClient\HttpClientInterface'
+            $authenticator: '@discogs_api.authenticator'
+            $dispatcher: '@event_dispatcher'
+            $userAgent: '%discogs_api.config.user_agent%'
+            $enableRateLimitHeader: '%discogs_api.config.enable_rate_limit_header%'
+            $maxRetries: '%discogs_api.config.max_retries%'
+            $cachePool: '@=parameter("discogs_api.config.cache.enabled") ? service("cache.app") : null'
+            $cacheTtl: '%discogs_api.config.cache.ttl%'
+
+    DiscogsApiBundle\Service\:
+        resource: '../src/Service/'
+
+    # Facade
+    DiscogsApiBundle\Client\DiscogsClient:
+        public: true

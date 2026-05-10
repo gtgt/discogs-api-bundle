@@ -1,24 +1,26 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Controller;
+namespace DiscogsApiBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\{Request, Response, RedirectResponse, JsonResponse};
-use Symfony\Component\Routing\Annotation\Route;
-use Tamash\DiscogsApiBundle\Client\Authenticator\OAuth1Authenticator;
+use DiscogsApiBundle\Client\Authenticator\OAuth1Authenticator;
+use DiscogsApiBundle\Event\OAuthCompleteEvent;
+use DiscogsApiBundle\Event\OAuthRequestTokenEvent;
+use League\OAuth1\Client\Credentials\TemporaryCredentials;
 use League\OAuth1\Client\Credentials\TokenCredentials;
-use Tamash\DiscogsApiBundle\Event\{
-    OAuthRequestTokenEvent,
-    OAuthAccessTokenEvent,
-    OAuthCompleteEvent
-};
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class OAuthController extends AbstractController
 {
     private OAuth1Authenticator $oauthServer;
+
     private EventDispatcherInterface $dispatcher;
 
     public function __construct(OAuth1Authenticator $oauthServer, EventDispatcherInterface $dispatcher)
@@ -32,7 +34,7 @@ class OAuthController extends AbstractController
      * Initiates OAuth flow and redirects user to Discogs
      */
     #[Route('/oauth/request-token', name: 'discogs_api_oauth_request_token', methods: ['GET'])]
-    public function requestToken(Request $request, string $callbackUrl = null): RedirectResponse
+    public function requestToken(Request $request, ?string $callbackUrl = null): RedirectResponse
     {
         // Get temporary credentials
         $temporaryCredentials = $this->oauthServer->getTemporaryCredentials();
@@ -45,15 +47,13 @@ class OAuthController extends AbstractController
             $callbackUrl = $this->generateUrl('discogs_api_oauth_callback', [], 0);
         }
 
-        // Add callback to temporary credentials
-        $temporaryCredentials['oauth_callback'] = $callbackUrl;
-
         // Dispatch event
         $event = new OAuthRequestTokenEvent($temporaryCredentials, $callbackUrl);
         $this->dispatcher->dispatch($event, 'discogs_api.oauth.request_token');
 
         // Redirect to Discogs authorization page
         $authUrl = $this->oauthServer->getAuthorizationUrl($temporaryCredentials);
+
         return $this->redirect($authUrl);
     }
 
@@ -65,20 +65,26 @@ class OAuthController extends AbstractController
     public function callback(Request $request, string $token, string $verifier): Response
     {
         $session = $request->getSession();
-        $temporaryCredentials = @unserialize($session->get('discogs_oauth_temporary', ''));
+        /** @var TemporaryCredentials $temporaryCredentials */
+        $temporaryCredentials = @unserialize($session->get('discogs_oauth_temporary', ''), [
+            'allowed_classes' => [TemporaryCredentials::class],
+        ]);
 
-        if (!$temporaryCredentials) {
+        if (! $temporaryCredentials) {
             throw new \RuntimeException('OAuth temporary credentials not found in session');
         }
 
-        // Exchange request token for access token
+        // Exchange request token for access token using parent method
         $tokenCredentials = $this->oauthServer->getTokenCredentials(
             $temporaryCredentials,
             $token,
             $verifier
         );
 
-        // Store token credentials in session or DB
+        // Store token credentials in authenticator for API requests
+        $this->oauthServer->setTokenCredentials($tokenCredentials);
+
+        // Store token credentials in session for retrieval/debugging
         $session->set('discogs_oauth_token', serialize($tokenCredentials));
 
         // Dispatch completion event
@@ -104,7 +110,10 @@ class OAuthController extends AbstractController
     {
         $token = $request->getSession()->get('discogs_oauth_token');
         if ($token) {
-            $token = unserialize($token);
+            $token = @unserialize($token, [
+                'allowed_classes' => [TokenCredentials::class],
+            ]);
+
             return $this->json([
                 'token' => $token->getIdentifier(),
                 'token_secret' => $token->getSecret(),

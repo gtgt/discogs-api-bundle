@@ -1,16 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Service;
+namespace DiscogsApiBundle\Service;
 
-use Tamash\DiscogsApiBundle\Client\Request\RequestHandler;
-use Tamash\DiscogsApiBundle\Model\Label;
-use Tamash\DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Model\Label;
 
 class LabelService
 {
     private RequestHandler $requestHandler;
+
     private string $baseUrl;
 
     public function __construct(RequestHandler $requestHandler, string $baseUrl = 'https://api.discogs.com')
@@ -34,6 +35,6 @@ class LabelService
         $response = $this->requestHandler->get($url, ['query' => $options]);
         $data = $response->toArray(false);
 
-        return \Tamash\DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
+        return \DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
     }
 }

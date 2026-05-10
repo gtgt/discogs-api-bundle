@@ -1,15 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Service;
+namespace DiscogsApiBundle\Service;
 
-use Tamash\DiscogsApiBundle\Client\Request\RequestHandler;
-use Tamash\DiscogsApiBundle\Model\User;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use DiscogsApiBundle\Model\User;
 
 class UserService
 {
     private RequestHandler $requestHandler;
+
     private string $baseUrl;
 
     public function __construct(RequestHandler $requestHandler, string $baseUrl = 'https://api.discogs.com')
@@ -20,7 +21,7 @@ class UserService
 
     public function getIdentity(): User
     {
-        $url = $this->baseUrl . '/users/identity';
+        $url = $this->baseUrl . '/oauth/identity';
         $response = $this->requestHandler->get($url);
         $data = $response->toArray(false);
 

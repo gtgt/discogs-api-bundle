@@ -1,7 +1,6 @@
-imports:
-    - { resource: '../vendor/tamas-gere/discogs-api-bundle/config/packages/discogs_api.yaml' }
-
 framework:
     secret: 'S0ME_SECRET'
     test: true
     http_client: { mock_response_factory: null }
+    router:
+        resource: '../routes.yaml'

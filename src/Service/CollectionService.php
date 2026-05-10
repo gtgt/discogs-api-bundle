@@ -1,18 +1,18 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Service;
+namespace DiscogsApiBundle\Service;
 
-use Tamash\DiscogsApiBundle\Client\Request\RequestHandler;
-use Tamash\DiscogsApiBundle\Model\Collection\{CollectionFolder, CollectionItem};
-use Tamash\DiscogsApiBundle\Model\Community\{Rating, Stats};
-use Tamash\DiscogsApiBundle\Client\Response\PaginatedResponse;
-use Tamash\DiscogsApiBundle\Exception\DiscogsApiException;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Exception\NotFoundException;
+use DiscogsApiBundle\Model\Collection\CollectionFolder;
 
 class CollectionService
 {
     private RequestHandler $requestHandler;
+
     private string $baseUrl;
 
     public function __construct(RequestHandler $requestHandler, string $baseUrl = 'https://api.discogs.com')
@@ -25,11 +25,11 @@ class CollectionService
     {
         $url = sprintf('%s/users/%s/collection/folders', $this->baseUrl, rawurlencode($username));
         $response = $this->requestHandler->get($url, [
-            'query' => ['page' => $page, 'per_page' => $perPage]
+            'query' => ['page' => $page, 'per_page' => $perPage],
         ]);
         $data = $response->toArray(false);
 
-        return \Tamash\DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
+        return \DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
     }
 
     public function getCollectionFolders(string $username): array
@@ -42,6 +42,7 @@ class CollectionService
         foreach ($data['folders'] ?? [] as $folderData) {
             $folders[] = CollectionFolder::fromArray($folderData);
         }
+
         return $folders;
     }
 
@@ -60,7 +61,7 @@ class CollectionService
         $response = $this->requestHandler->get($url, ['query' => $options]);
         $data = $response->toArray(false);
 
-        return \Tamash\DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
+        return \DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
     }
 
     public function addToCollection(string $username, int $releaseId, ?int $folderId = null, ?int $rating = null, ?string $notes = null): void
@@ -76,7 +77,7 @@ class CollectionService
         }
 
         $response = $this->requestHandler->post($url, [
-            'json' => $body
+            'json' => $body,
         ]);
         $response->getStatusCode(); // Should be 201
     }
@@ -95,7 +96,8 @@ class CollectionService
             $url = sprintf('%s/users/%s/collection/releases/%d/rating', $this->baseUrl, rawurlencode($username), $releaseId);
             $response = $this->requestHandler->get($url);
             $data = $response->toArray(false);
-            return isset($data['rating']) ? (int)$data['rating'] : null;
+
+            return isset($data['rating']) ? (int) $data['rating'] : null;
         } catch (NotFoundException $e) {
             return null;
         }

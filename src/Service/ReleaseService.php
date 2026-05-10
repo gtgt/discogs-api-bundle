@@ -1,16 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Service;
+namespace DiscogsApiBundle\Service;
 
-use Tamash\DiscogsApiBundle\Client\Request\RequestHandler;
-use Tamash\DiscogsApiBundle\Model\Release;
-use Tamash\DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use DiscogsApiBundle\Model\Release;
 
 class ReleaseService
 {
     private RequestHandler $requestHandler;
+
     private string $baseUrl;
 
     public function __construct(RequestHandler $requestHandler, string $baseUrl = 'https://api.discogs.com')
@@ -35,15 +35,15 @@ class ReleaseService
     public function getReleaseStats(int $releaseId): array
     {
         $url = sprintf('%s/releases/%d/stats', $this->baseUrl, $releaseId);
-        $response = $this->requestHandler->get($url);
-        return $response->toArray(false);
+
+        return $this->requestHandler->get($url)->toArray(false);
     }
 
     public function getReleaseRating(int $releaseId, string $username): array
     {
         $url = sprintf('%s/releases/%d/rating/%s', $this->baseUrl, $releaseId, rawurlencode($username));
-        $response = $this->requestHandler->get($url);
-        return $response->toArray(false);
+
+        return $this->requestHandler->get($url)->toArray(false);
     }
 
     public function setReleaseRating(int $releaseId, int $rating, ?string $username = null): void
@@ -54,7 +54,7 @@ class ReleaseService
             $body['username'] = $username;
         }
         $response = $this->requestHandler->put($url, [
-            'json' => $body
+            'json' => $body,
         ]);
         $response->getStatusCode(); // Should be 200 or 201
     }

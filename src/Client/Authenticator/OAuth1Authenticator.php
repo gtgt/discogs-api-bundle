@@ -1,20 +1,24 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Client\Authenticator;
+namespace DiscogsApiBundle\Client\Authenticator;
 
+use League\OAuth1\Client\Credentials\TemporaryCredentials;
+use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Server\Server as BaseServer;
-use League\OAuth1\Client\Credentials\{CredentialsInterface, TokenCredentials};
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class OAuth1Authenticator extends BaseServer implements AuthenticatorInterface
 {
     private ?TokenCredentials $tokenCredentials = null;
 
-    public function __construct(array $config)
-    {
-        parent::__construct($config);
+    public function __construct(
+        private string $identifier,
+        private string $secret,
+        private string $callbackUri,
+    ) {
+        parent::__construct(['identifier' => $this->identifier, 'secret' => $this->secret, 'callback_uri' => $this->callbackUri]);
     }
 
     public function setTokenCredentials(TokenCredentials $credentials): void
@@ -22,7 +26,7 @@ final class OAuth1Authenticator extends BaseServer implements AuthenticatorInter
         $this->tokenCredentials = $credentials;
     }
 
-    public function getTokenCredentials(): ?TokenCredentials
+    public function getStoredTokenCredentials(): ?TokenCredentials
     {
         return $this->tokenCredentials;
     }
@@ -45,7 +49,7 @@ final class OAuth1Authenticator extends BaseServer implements AuthenticatorInter
             'oauth_signature="' . rawurlencode($this->secret) . '&' . rawurlencode($this->tokenCredentials->getSecret()) . '", ' .
             'oauth_timestamp="' . time() . '", ' .
             'oauth_nonce="' . bin2hex(random_bytes(16)) . '", ' .
-            'oauth_version="1.0"'
+            'oauth_version="1.0"',
         ];
 
         $options['headers'] = array_merge($options['headers'] ?? [], $headers);
@@ -73,10 +77,14 @@ final class OAuth1Authenticator extends BaseServer implements AuthenticatorInter
         return 'https://api.discogs.com/oauth/request_token';
     }
 
-    protected function getAuthorizationUrl($temporaryCredentials): string
+    public function getAuthorizationUrl($temporaryIdentifier, array $options = []): string
     {
+        $token = $temporaryIdentifier instanceof TemporaryCredentials
+            ? $temporaryIdentifier->getIdentifier()
+            : $temporaryIdentifier;
+
         return 'https://www.discogs.com/oauth/authorize?' . http_build_query([
-            'oauth_token' => $temporaryCredentials['oauth_token']
+            'oauth_token' => $token,
         ]);
     }
 
@@ -98,5 +106,60 @@ final class OAuth1Authenticator extends BaseServer implements AuthenticatorInter
     protected function contentType(): string
     {
         return 'application/x-www-form-urlencoded';
+    }
+
+    // ---- Abstract method implementations required by League\OAuth1\Client\Server\Server ----
+
+    public function urlTemporaryCredentials(): string
+    {
+        return $this->getTemporaryCredentialsUrl();
+    }
+
+    public function urlAuthorization(): string
+    {
+        return $this->getBaseAuthorizationUrl() . '/authorize';
+    }
+
+    public function urlTokenCredentials(): string
+    {
+        return $this->getAccessTokenUrl();
+    }
+
+    public function urlUserDetails(): string
+    {
+        return $this->getBaseUrl() . '/oauth/identity';
+    }
+
+    public function userDetails($data, TokenCredentials $tokenCredentials): \League\OAuth1\Client\Server\User
+    {
+        $user = new \League\OAuth1\Client\Server\User();
+        $user->uid = $data['id'] ?? null;
+        $user->nickname = $data['username'] ?? null;
+        $user->name = $data['name'] ?? null;
+        $user->firstName = $data['firstname'] ?? null;
+        $user->lastName = $data['lastname'] ?? null;
+        $user->email = $data['email'] ?? null;
+        $user->location = $data['location'] ?? null;
+        $user->description = $data['profile'] ?? null;
+        $user->imageUrl = $data['avatar_url'] ?? null;
+        $user->urls = $data['resource_url'] ?? [];
+        $user->extra = $data;
+
+        return $user;
+    }
+
+    public function userUid($data, TokenCredentials $tokenCredentials)
+    {
+        return $data['id'] ?? null;
+    }
+
+    public function userEmail($data, TokenCredentials $tokenCredentials): ?string
+    {
+        return $data['email'] ?? null;
+    }
+
+    public function userScreenName($data, TokenCredentials $tokenCredentials): ?string
+    {
+        return $data['username'] ?? null;
     }
 }

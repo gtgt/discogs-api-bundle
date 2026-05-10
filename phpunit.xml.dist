@@ -1,34 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="tests/bootstrap.php"
-         colors="true"
-         beStrictAboutOutputDuringTests="true"
-         beStrictAboutTestsThatDoNotTestAnything="true"
-         failOnRisky="true"
-         failOnWarning="true"
->
-    <testsuites>
-        <testsuite name="DiscogsApiBundle Test Suite">
-            <directory suffix="Test.php">tests/Unit</directory>
-            <directory suffix="Test.php">tests/Functional</directory>
-            <directory suffix="Test.php">tests/Integration</directory>
-        </testsuite>
-    </testsuites>
-
-    <coverage processUncoveredFiles="true">
-        <include>
-            <directory suffix=".php">src</directory>
-        </include>
-    </coverage>
-
-    <php>
-        <!-- Test Discogs credentials for integration tests (optional) -->
-        <!-- Uncomment and set these for live API tests -->
-        <!-- <env name="DISCOGS_USER_TOKEN" value="your_token_here"/>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd" bootstrap="tests/bootstrap.php" colors="true" beStrictAboutOutputDuringTests="true" beStrictAboutTestsThatDoNotTestAnything="true" failOnRisky="true" failOnWarning="true" cacheDirectory=".phpunit.cache">
+  <testsuites>
+    <testsuite name="DiscogsApiBundle Test Suite">
+      <directory suffix="Test.php">tests/Unit</directory>
+      <directory suffix="Test.php">tests/Functional</directory>
+      <directory suffix="Test.php">tests/Integration</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <!-- Test Discogs credentials for integration tests (optional) -->
+    <!-- Uncomment and set these for live API tests -->
+    <!-- <env name="DISCOGS_USER_TOKEN" value="your_token_here"/>
         <env name="DISCOGS_CONSUMER_KEY" value="your_key"/>
-        <env name="DISCOGS_CONSUMER_SECRET" value="your_secret"/>
-        <env name="DISCOGS_TOKEN" value="your_oauth_token"/>
-        <env name="DISCOGS_TOKEN_SECRET" value="your_oauth_token_secret"/> -->
-    </php>
+        <env name="DISCOGS_CONSUMER_SECRET" value="your_secret"/>-->
+  </php>
+  <source>
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+  </source>
 </phpunit>

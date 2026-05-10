@@ -1,16 +1,18 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Service;
+namespace DiscogsApiBundle\Service;
 
-use Tamash\DiscogsApiBundle\Client\Request\RequestHandler;
-use Tamash\DiscogsApiBundle\Model\Marketplace\{Order, OrderMessage};
-use Tamash\DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Model\Marketplace\Order;
+use DiscogsApiBundle\Model\Marketplace\OrderMessage;
 
 class OrderService
 {
     private RequestHandler $requestHandler;
+
     private string $baseUrl;
 
     public function __construct(RequestHandler $requestHandler, string $baseUrl = 'https://api.discogs.com')
@@ -25,7 +27,7 @@ class OrderService
         $response = $this->requestHandler->get($url, ['query' => $options]);
         $data = $response->toArray(false);
 
-        return \Tamash\DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
+        return \DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
     }
 
     public function getOrder(string $orderId): Order
@@ -58,6 +60,7 @@ class OrderService
         foreach ($data['messages'] ?? [] as $msgData) {
             $messages[] = OrderMessage::fromArray($msgData);
         }
+
         return $messages;
     }
 
@@ -65,7 +68,7 @@ class OrderService
     {
         $url = sprintf('%s/marketplace/orders/%s/messages', $this->baseUrl, $orderId);
         $response = $this->requestHandler->post($url, [
-            'json' => ['message' => $message]
+            'json' => ['message' => $message],
         ]);
         $data = $response->toArray(false);
 

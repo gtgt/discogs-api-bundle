@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tamash\DiscogsApiBundle\Tests\Unit\Model;
+namespace DiscogsApiBundle\Tests\Unit\Model;
 
-use Tamash\DiscogsApiBundle\Model\Release;
+use DiscogsApiBundle\Model\Release;
 use PHPUnit\Framework\TestCase;
 
 class ReleaseTest extends TestCase
@@ -54,6 +54,6 @@ class ReleaseTest extends TestCase
         $this->assertCount(1, $release->labels);
         $this->assertSame('Test Label', $release->labels[0]['name']);
         $this->assertNotNull($release->master);
-        $this->assertSame(999, $release->master['id']);
+        $this->assertSame(999, $release->master->id);
     }
 }

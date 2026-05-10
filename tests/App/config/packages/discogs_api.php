@@ -1,7 +1,6 @@
 <?php
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Tamash\DiscogsApiBundle\DiscogsApiBundle;
 
 return static function (ContainerConfigurator $c) {
     $c->extension('discogs_api', [
@@ -15,5 +14,8 @@ return static function (ContainerConfigurator $c) {
         //     'consumer_secret' => getenv('DISCOGS_CONSUMER_SECRET'),
         // ],
         'dispatch_events' => true,
+        'cache' => [
+            'enabled' => false,
+        ],
     ]);
 };

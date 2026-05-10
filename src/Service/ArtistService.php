@@ -1,16 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Service;
+namespace DiscogsApiBundle\Service;
 
-use Tamash\DiscogsApiBundle\Client\Request\RequestHandler;
-use Tamash\DiscogsApiBundle\Model\Artist;
-use Tamash\DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Model\Artist;
 
 class ArtistService
 {
     private RequestHandler $requestHandler;
+
     private string $baseUrl;
 
     public function __construct(RequestHandler $requestHandler, string $baseUrl = 'https://api.discogs.com')
@@ -34,7 +35,7 @@ class ArtistService
         $response = $this->requestHandler->get($url, ['query' => $options]);
         $data = $response->toArray(false);
 
-        return \Tamash\DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
+        return \DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
     }
 
     public function getArtistByName(string $name): ?Artist
@@ -45,6 +46,7 @@ class ArtistService
                 return $artist;
             }
         }
+
         return null;
     }
 
@@ -52,10 +54,10 @@ class ArtistService
     {
         $url = $this->baseUrl . '/database/search';
         $response = $this->requestHandler->get($url, [
-            'query' => array_merge(['q' => $query], $options)
+            'query' => array_merge(['q' => $query], $options),
         ]);
         $data = $response->toArray(false);
 
-        return \Tamash\DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
+        return \DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
     }
 }

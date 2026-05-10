@@ -1,6 +1,6 @@
 {
     "bundles": {
-        "Tamash\\\\DiscogsApiBundle\\\\DiscogsApiBundle": []
+        "\\DiscogsApiBundle\\\\DiscogsApiBundle": []
     },
     "delete": [
         "config/packages/discogs_api.yaml"

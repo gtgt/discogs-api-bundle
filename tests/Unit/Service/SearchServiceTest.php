@@ -1,15 +1,34 @@
 <?php
 
-namespace Tamash\DiscogsApiBundle\Tests\Unit\Service;
+namespace DiscogsApiBundle\Tests\Unit\Service;
 
-use Tamash\DiscogsApiBundle\Tests\Unit\UnitTestCase;
-use Tamash\DiscogsApiBundle\Service\SearchService;
-use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response;
-use Tamash\DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Tests\Unit\UnitTestCase;
+use DiscogsApiBundle\Service\SearchService;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use DiscogsApiBundle\Client\Response\PaginatedResponse;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class SearchServiceTest extends UnitTestCase
 {
+    private HttpClientInterface&MockObject $httpClient;
+    private RequestHandler $requestHandler;
+
+    protected function setUp(): void
+    {
+        $this->httpClient = $this->createMock(HttpClientInterface::class);
+        $this->requestHandler = new RequestHandler(
+            $this->httpClient,
+            null, // authenticator
+            null, // dispatcher
+            'test-agent',
+            false, // enableRateLimitHeader
+            0, // maxRetries
+            null, // cachePool
+        );
+    }
+
     public function testSearchArtists(): void
     {
         $data = [
@@ -29,8 +48,27 @@ class SearchServiceTest extends UnitTestCase
             ],
         ];
 
-        $client = new MockHttpClient(fn () => new Response($data, 200));
-        $service = new SearchService($client);
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->once())
+            ->method('toArray')
+            ->willReturn($data);
+        $response->expects($this->once())
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'https://api.discogs.com/database/search', [
+                'headers' => ['User-Agent' => 'test-agent'],
+                'query' => [
+                    'q' => 'Daft Punk',
+                    'per_page' => 5,
+                    'type' => 'artist',
+                ]
+            ])
+            ->willReturn($response);
+
+        $service = new SearchService($this->requestHandler);
 
         $results = $service->searchArtists('Daft Punk', ['per_page' => 5]);
 
@@ -60,12 +98,31 @@ class SearchServiceTest extends UnitTestCase
             ],
         ];
 
-        $client = new MockHttpClient(fn () => new Response($data, 200));
-        $service = new SearchService($client);
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->once())
+            ->method('toArray')
+            ->willReturn($data);
+        $response->expects($this->once())
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'https://api.discogs.com/database/search', [
+                'headers' => ['User-Agent' => 'test-agent'],
+                'query' => [
+                    'q' => 'Homework',
+                    'type' => 'release',
+                ]
+            ])
+            ->willReturn($response);
+
+        $service = new SearchService($this->requestHandler);
 
         $results = $service->searchReleases('Homework');
 
         $this->assertCount(1, $results);
-        $this->assertSame('release', $results[0]['type']);
+        $this->assertSame('release', $results->getItems()[0]['type']);
+        $this->assertSame(456, $results->getItems()[0]['id']);
     }
 }

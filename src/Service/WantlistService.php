@@ -1,16 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Service;
+namespace DiscogsApiBundle\Service;
 
-use Tamash\DiscogsApiBundle\Client\Request\RequestHandler;
-use Tamash\DiscogsApiBundle\Model\Collection\CollectionItem;
-use Tamash\DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Model\Collection\CollectionItem;
 
 class WantlistService
 {
     private RequestHandler $requestHandler;
+
     private string $baseUrl;
 
     public function __construct(RequestHandler $requestHandler, string $baseUrl = 'https://api.discogs.com')
@@ -26,12 +27,13 @@ class WantlistService
         $data = $response->toArray(false);
 
         // Map items to CollectionItem objects for consistency
-        $items = array_map(fn($item) => CollectionItem::fromArray($item), $data['releases'] ?? $data);
+        $items = array_map(fn ($item) => CollectionItem::fromArray($item), $data['releases'] ?? $data);
+
         return new PaginatedResponse(
             $items,
-            (int)($data['pagination']['page'] ?? 1),
-            (int)($data['pagination']['pages'] ?? 1),
-            (int)($data['pagination']['per_page'] ?? count($items)),
+            (int) ($data['pagination']['page'] ?? 1),
+            (int) ($data['pagination']['pages'] ?? 1),
+            (int) ($data['pagination']['per_page'] ?? count($items)),
             $data['pagination']['urls']['next'] ?? null,
             $data['pagination']['urls']['previous'] ?? null
         );
@@ -43,7 +45,7 @@ class WantlistService
         $body = array_merge(['release_id' => $releaseId], $data);
 
         $response = $this->requestHandler->post($url, [
-            'json' => $body
+            'json' => $body,
         ]);
         $response->getStatusCode(); // Should be 201
     }
@@ -59,7 +61,7 @@ class WantlistService
     {
         $url = sprintf('%s/users/%s/wantlist/%d', $this->baseUrl, rawurlencode($username), $releaseId);
         $response = $this->requestHandler->put($url, [
-            'json' => $data
+            'json' => $data,
         ]);
         $response->getStatusCode(); // Should be 200
     }

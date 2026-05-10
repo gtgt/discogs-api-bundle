@@ -1,8 +1,8 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Exception;
+namespace DiscogsApiBundle\Exception;
 
 use Symfony\Contracts\HttpClient\ResponseInterface;
 

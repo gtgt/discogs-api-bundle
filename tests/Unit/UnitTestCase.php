@@ -1,6 +1,6 @@
 <?php
 
-namespace Tamash\DiscogsApiBundle\Tests\Unit;
+namespace DiscogsApiBundle\Tests\Unit;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 

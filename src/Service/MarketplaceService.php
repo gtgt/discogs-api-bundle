@@ -1,16 +1,19 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Service;
+namespace DiscogsApiBundle\Service;
 
-use Tamash\DiscogsApiBundle\Client\Request\RequestHandler;
-use Tamash\DiscogsApiBundle\Model\Marketplace\{Listing, Order, OrderMessage};
-use Tamash\DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Model\Marketplace\Listing;
+use DiscogsApiBundle\Model\Marketplace\Order;
+use DiscogsApiBundle\Model\Marketplace\OrderMessage;
 
 class MarketplaceService
 {
     private RequestHandler $requestHandler;
+
     private string $baseUrl;
 
     public function __construct(RequestHandler $requestHandler, string $baseUrl = 'https://api.discogs.com')
@@ -26,6 +29,7 @@ class MarketplaceService
      * @param string $condition Condition code: 'Mint', 'Near Mint', 'Very Good Plus', 'Very Good', 'Good Plus', 'Good', 'Fair', 'Poor'
      * @param float $price Selling price
      * @param array $options {
+     *
      *     @var string $status 'For Sale', 'Draft', 'Sold', 'Expired', 'Cancelled'
      *     @var string|null $sleeveCondition Condition of sleeve
      *     @var string|null $comments Seller comments
@@ -38,7 +42,7 @@ class MarketplaceService
      */
     public function createListing(int $releaseId, string $condition, float $price, array $options = []): Listing
     {
-        $url = $this->baseUrl . '/inventory/listings';
+        $url = $this->baseUrl . '/marketplace/listings';
         $body = array_merge([
             'release_id' => $releaseId,
             'condition' => $condition,
@@ -53,7 +57,7 @@ class MarketplaceService
 
     public function getListing(int|string $listingId, ?string $currency = null): Listing
     {
-        $url = sprintf('%s/inventory/listings/%s', $this->baseUrl, $listingId);
+        $url = sprintf('%s/marketplace/listings/%s', $this->baseUrl, $listingId);
         $options = [];
         if ($currency) {
             $options['query'] = ['curr_abbr' => $currency];
@@ -66,7 +70,7 @@ class MarketplaceService
 
     public function updateListing(int|string $listingId, string $condition, float $price, array $options = []): Listing
     {
-        $url = sprintf('%s/inventory/listings/%s', $this->baseUrl, $listingId);
+        $url = sprintf('%s/marketplace/listings/%s', $this->baseUrl, $listingId);
         $body = array_merge([
             'condition' => $condition,
             'price' => $price,
@@ -80,7 +84,7 @@ class MarketplaceService
 
     public function deleteListing(int|string $listingId): void
     {
-        $url = sprintf('%s/inventory/listings/%s', $this->baseUrl, $listingId);
+        $url = sprintf('%s/marketplace/listings/%s', $this->baseUrl, $listingId);
         $response = $this->requestHandler->delete($url);
         $response->getStatusCode(); // 204
     }
@@ -97,7 +101,7 @@ class MarketplaceService
         $response = $this->requestHandler->get($url, ['query' => $query]);
         $data = $response->toArray(false);
 
-        return \Tamash\DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
+        return \DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
     }
 
     public function getOrders(array $options = []): PaginatedResponse
@@ -106,7 +110,7 @@ class MarketplaceService
         $response = $this->requestHandler->get($url, ['query' => $options]);
         $data = $response->toArray(false);
 
-        return \Tamash\DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
+        return \DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
     }
 
     public function getOrder(string $orderId): Order
@@ -145,6 +149,7 @@ class MarketplaceService
         foreach ($data['messages'] ?? [] as $msgData) {
             $messages[] = OrderMessage::fromArray($msgData);
         }
+
         return $messages;
     }
 
@@ -152,7 +157,7 @@ class MarketplaceService
     {
         $url = sprintf('%s/marketplace/orders/%s/messages', $this->baseUrl, $orderId);
         $response = $this->requestHandler->post($url, [
-            'json' => ['message' => $message]
+            'json' => ['message' => $message],
         ]);
         $data = $response->toArray(false);
 

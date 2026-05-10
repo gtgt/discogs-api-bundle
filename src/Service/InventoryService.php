@@ -1,16 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Service;
+namespace DiscogsApiBundle\Service;
 
-use Tamash\DiscogsApiBundle\Client\Request\RequestHandler;
-use Tamash\DiscogsApiBundle\Model\Marketplace\Listing;
-use Tamash\DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Model\Marketplace\Listing;
 
 class InventoryService
 {
     private RequestHandler $requestHandler;
+
     private string $baseUrl;
 
     public function __construct(RequestHandler $requestHandler, string $baseUrl = 'https://api.discogs.com')
@@ -23,7 +24,6 @@ class InventoryService
      * Get all inventory listings
      *
      * @param string|null $username 'me' for authenticated user
-     * @param string|null $status Filter by status: 'For Sale', 'Draft', 'Sold', 'Expired', 'Cancelled'
      */
     public function getInventory(?string $username = null, array $options = []): PaginatedResponse
     {
@@ -34,7 +34,7 @@ class InventoryService
         $response = $this->requestHandler->get($url, ['query' => $query]);
         $data = $response->toArray(false);
 
-        return \Tamash\DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
+        return \DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
     }
 
     /**

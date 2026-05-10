@@ -1,28 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\DependencyInjection;
+namespace DiscogsApiBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\{ContainerBuilder, Extension};
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Config\FileLocator;
-use Tamash\DiscogsApiBundle\Client\{Authenticator\AuthenticatorInterface, Authenticator\UserTokenAuthenticator, Authenticator\OAuth1Authenticator};
-use Tamash\DiscogsApiBundle\Client\{DiscogsClient, Request\RequestHandler};
-use Tamash\DiscogsApiBundle\Service\{
-    ArtistService,
-    ReleaseService,
-    MasterService,
-    LabelService,
-    UserService,
-    CollectionService,
-    WantlistService,
-    MarketplaceService,
-    InventoryService,
-    OrderService,
-    SearchService
-};
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class DiscogsApiExtension extends Extension
 {
@@ -32,10 +17,18 @@ class DiscogsApiExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         // Register configuration as a parameter
-        $container->setParameter('discogs_api.config', $config);
+        $this->setConfigAsParameter('discogs_api.config', $config, $container);
 
         // Load services
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../'));
-        $loader->load('services.php');
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
+        $loader->load('services.yaml');
+    }
+
+    private function setConfigAsParameter(string $prefix, array $config, ContainerBuilder $container)
+    {
+        foreach ($config as $key => $value) {
+            is_array($value) ? $this->setConfigAsParameter($prefix . '.' . $key, $value, $container) : $container->setParameter($prefix . '.' . $key, $value);
+        }
+        $container->setParameter($prefix, $config);
     }
 }

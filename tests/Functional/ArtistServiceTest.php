@@ -1,22 +1,33 @@
 <?php
 
-namespace Tamash\DiscogsApiBundle\Tests\Functional;
+namespace DiscogsApiBundle\Tests\Functional;
 
-use Tamash\DiscogsApiBundle\Tests\Unit\UnitTestCase;
-use Tamash\DiscogsApiBundle\Client\DiscogsClient;
-use Tamash\DiscogsApiBundle\Service\ArtistService;
-use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response;
-use Tamash\DiscogsApiBundle\Model\Artist;
-use PHPUnit\Framework\Attributes\CoversClass;
+use DiscogsApiBundle\Tests\Unit\UnitTestCase;
+use DiscogsApiBundle\Client\DiscogsClient;
+use DiscogsApiBundle\Service\ArtistService;
+use DiscogsApiBundle\Model\Artist;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
-#[CoversClass(ArtistService::class)]
 class ArtistServiceTest extends UnitTestCase
 {
-    private function createMockClient(array $responseData, int $statusCode = 200): MockHttpClient
+    private HttpClientInterface&MockObject $httpClient;
+    private RequestHandler $requestHandler;
+
+    protected function setUp(): void
     {
-        $mockResponse = new Response($responseData, $statusCode, [], null, true);
-        return new MockHttpClient(fn () => $mockResponse);
+        $this->httpClient = $this->createMock(HttpClientInterface::class);
+        $this->requestHandler = new RequestHandler(
+            $this->httpClient,
+            null, // authenticator
+            null, // dispatcher
+            'test-agent',
+            false, // enableRateLimitHeader
+            0, // maxRetries
+            null, // cachePool
+        );
     }
 
     public function testGetArtist(): void
@@ -28,8 +39,23 @@ class ArtistServiceTest extends UnitTestCase
             'profileviews' => 100,
         ];
 
-        $client = $this->createMockClient($responseData);
-        $service = new ArtistService($client);
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->once())
+            ->method('toArray')
+            ->willReturn($responseData);
+        $response->expects($this->once())
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'https://api.discogs.com/artists/123', [
+                'headers' => ['User-Agent' => 'test-agent'],
+                'query' => []
+            ])
+            ->willReturn($response);
+
+        $service = new ArtistService($this->requestHandler);
 
         $artist = $service->getArtist(123);
 

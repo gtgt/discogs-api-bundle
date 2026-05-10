@@ -1,16 +1,20 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\Service;
+namespace DiscogsApiBundle\Service;
 
-use Tamash\DiscogsApiBundle\Client\Request\RequestHandler;
-use Tamash\DiscogsApiBundle\Model\{Artist, Release, Master, Label};
-use Tamash\DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Client\Request\RequestHandler;
+use DiscogsApiBundle\Client\Response\PaginatedResponse;
+use DiscogsApiBundle\Model\Artist;
+use DiscogsApiBundle\Model\Label;
+use DiscogsApiBundle\Model\Master;
+use DiscogsApiBundle\Model\Release;
 
 class SearchService
 {
     private RequestHandler $requestHandler;
+
     private string $baseUrl;
 
     public function __construct(RequestHandler $requestHandler, string $baseUrl = 'https://api.discogs.com')
@@ -24,6 +28,7 @@ class SearchService
      *
      * @param string $query Search query
      * @param array $options {
+     *
      *     @var string|null $type Filter by type: 'artist', 'release', 'master', 'label'
      *     @var string|null $title Filter by title
      * @var string|null $releaseTitle Filter by release title
@@ -44,6 +49,7 @@ class SearchService
      * @var int $page Page number
      * @var int $per_page Results per page (default 50, max 100)
      * }
+     *
      * @return PaginatedResponse<array{type: string, id: int, title: string, thumb?: string}>
      */
     public function search(string $query, array $options = []): PaginatedResponse
@@ -54,7 +60,7 @@ class SearchService
         $response = $this->requestHandler->get($url, ['query' => $queryParams]);
         $data = $response->toArray(false);
 
-        $paginated = \Tamash\DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
+        $paginated = \DiscogsApiBundle\Client\Request\RequestFactory::createPaginatedResponse($data, $response);
 
         // Map results to simple DTOs (each result has type, id, title, thumb)
         // The actual model objects would require fetching each individually
@@ -67,6 +73,7 @@ class SearchService
     public function searchArtists(string $query, array $options = []): PaginatedResponse
     {
         $options['type'] = 'artist';
+
         return $this->search($query, $options);
     }
 
@@ -76,6 +83,7 @@ class SearchService
     public function searchReleases(string $query, array $options = []): PaginatedResponse
     {
         $options['type'] = 'release';
+
         return $this->search($query, $options);
     }
 
@@ -85,6 +93,7 @@ class SearchService
     public function searchLabels(string $query, array $options = []): PaginatedResponse
     {
         $options['type'] = 'label';
+
         return $this->search($query, $options);
     }
 
@@ -94,6 +103,7 @@ class SearchService
     public function searchMasters(string $query, array $options = []): PaginatedResponse
     {
         $options['type'] = 'master';
+
         return $this->search($query, $options);
     }
 }

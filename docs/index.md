@@ -9,13 +9,11 @@ This bundle provides a complete, type-safe API client for the [Discogs REST API 
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Authentication](#authentication)
-- [Usage Examples](#usage-examples)
 - [Services](#services)
 - [Models](#models)
 - [Events](#events)
 - [Caching](#caching)
 - [Error Handling](#error-handling)
-- [Testing](#testing)
 - [Contributing](#contributing)
 
 ## Installation
@@ -217,7 +215,7 @@ public function addOrderMessage(string $orderId, string $message): OrderMessage
 For convenience, inject the single `DiscogsClient` facade which delegates to all services:
 
 ```php
-use Tamash\DiscogsApiBundle\Client\DiscogsClient;
+use DiscogsApiBundle\Client\DiscogsClient;
 
 class MyService
 {
@@ -255,6 +253,41 @@ try {
 }
 ```
 
+## Caching
+
+The bundle supports optional PSR-6 caching for GET requests. Caching is disabled by default; enable it in your config:
+
+```yaml
+discogs_api:
+    cache:
+        enabled: true
+        pool: 'cache.app'        # PSR-6 cache pool service ID
+        ttl:
+            artists: 3600        # 1 hour
+            releases: 1800       # 30 minutes
+            masters: 3600        # 1 hour
+            labels: 3600         # 1 hour
+            collection: 300      # 5 minutes
+            wantlist: 300        # 5 minutes
+            marketplace: 60      # 1 minute
+```
+
+**Endpoint TTL mapping** uses regex patterns on the URL path. Default patterns:
+
+| Pattern | Default TTL |
+|---------|-------------|
+| `/artists/*` | 3600s |
+| `/releases/*` | 1800s |
+| `/masters/*` | 3600s |
+| `/labels/*` | 3600s |
+| `/users/*/collection*` | 300s |
+| `/users/*/wantlist*` | 300s |
+| `/inventory*` | 60s |
+| `/marketplace/orders*` | 60s |
+| `/database/search` | 60s |
+
+Cache is automatically invalidated when you perform write operations (POST/PUT/DELETE), which clears the entire cache pool to maintain consistency.
+
 ## Events
 
 Enable events in config:
@@ -278,7 +311,7 @@ Available events:
 Example subscriber:
 
 ```php
-use Tamash\DiscogsApiBundle\Event\RequestBeforeEvent;
+use DiscogsApiBundle\Event\RequestBeforeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LoggingSubscriber implements EventSubscriberInterface

@@ -1,16 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Tamash\DiscogsApiBundle\DependencyInjection;
+namespace DiscogsApiBundle\DependencyInjection;
 
-use Tamash\DiscogsApiBundle\Client\Authenticator\{
-    AuthenticatorInterface,
-    UserTokenAuthenticator,
-    OAuth1Authenticator
-};
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use DiscogsApiBundle\Client\Authenticator\AuthenticatorInterface;
+use DiscogsApiBundle\Client\Authenticator\OAuth1Authenticator;
+use DiscogsApiBundle\Client\Authenticator\UserTokenAuthenticator;
 use League\OAuth1\Client\Credentials\TokenCredentials;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class AuthenticatorFactory
 {
@@ -23,11 +21,11 @@ class AuthenticatorFactory
 
         $oauthConfig = $config['oauth1'];
         if ($oauthConfig['consumer_key'] && $oauthConfig['consumer_secret']) {
-            $oauth = new OAuth1Authenticator([
-                'identifier' => $oauthConfig['consumer_key'],
-                'secret' => $oauthConfig['consumer_secret'],
-                'callback_uri' => $oauthConfig['callback_url'],
-            ]);
+            $oauth = new OAuth1Authenticator(
+                $oauthConfig['consumer_key'],
+                $oauthConfig['consumer_secret'],
+                $oauthConfig['callback_url'],
+            );
 
             // If token credentials exist, set them
             if ($oauthConfig['token'] && $oauthConfig['token_secret']) {
