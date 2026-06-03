@@ -1,5 +1,5 @@
 {
-    "name": "tamas-gere/discogs-api-bundle",
+    "name": "gtgt/discogs-api-bundle",
     "type": "symfony-bundle",
     "description": "Symfony Bundle providing a complete API client for Discogs.com v2.0 with OAuth 1.0a support",
     "keywords": ["discogs", "api", "client", "symfony", "bundle", "oauth"],
