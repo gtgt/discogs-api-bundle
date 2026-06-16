@@ -32,7 +32,7 @@ class CollectionItem extends AbstractModel {
         return new self(
             id: $releaseId,
             title: self::getStringOrNull($data['basic_information'] ?? [], 'title'),
-            formats: self::mapModels($data['formats'] ?? [], Format::class),
+            formats: self::mapModels($data['basic_information']['formats'] ?? [], Format::class),
             coverImage: self::getStringOrNull($data['basic_information'] ?? [], 'cover_image'),
             artists: self::mapModels($data['basic_information']['artists'] ?? [], Artist::class),
             rating: isset($data['rating']) ? (float)$data['rating'] : null,
