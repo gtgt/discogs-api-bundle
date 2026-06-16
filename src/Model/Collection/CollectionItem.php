@@ -22,8 +22,10 @@ class CollectionItem extends AbstractModel
 
     public static function fromArray(array $data): self
     {
+        $releaseId = (int) ($data['basic_information']['id'] ?? $data['release_id'] ?? $data['id']);
+
         return new self(
-            id: (int) $data['id'],
+            id: $releaseId,
             title: self::getStringOrNull($data['basic_information'] ?? [], 'title'),
             coverImage: self::getStringOrNull($data['basic_information'] ?? [], 'cover_image'),
             artists: $data['basic_information']['artists'] ?? null,
