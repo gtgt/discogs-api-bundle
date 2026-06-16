@@ -11,10 +11,10 @@ class CollectionItem extends AbstractModel
     public function __construct(
         public readonly int $id,
         public readonly ?string $title,
-        public readonly ?string $thumb,
+        public readonly ?string $coverImage,
         public readonly ?array $artists,
         public readonly ?int $rating,
-        public readonly ?string $notes,
+        public readonly ?array $fields,
         public readonly ?string $dateAdded,
         public readonly ?string $resourceUrl,
     ) {
@@ -23,12 +23,12 @@ class CollectionItem extends AbstractModel
     public static function fromArray(array $data): self
     {
         return new self(
-            id: (int) $data['release_id'],
+            id: (int) $data['id'],
             title: self::getStringOrNull($data['basic_information'] ?? [], 'title'),
-            thumb: self::getStringOrNull($data['basic_information'] ?? [], 'thumb'),
+            coverImage: self::getStringOrNull($data['basic_information'] ?? [], 'cover_image'),
             artists: $data['basic_information']['artists'] ?? null,
             rating: isset($data['rating']) ? (int) $data['rating'] : null,
-            notes: self::getStringOrNull($data, 'notes'),
+            fields: self::getArrayOrNull($data, 'notes'),
             dateAdded: self::getStringOrNull($data, 'date_added'),
             resourceUrl: self::getStringOrNull($data, 'resource_url'),
         );
