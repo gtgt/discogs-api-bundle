@@ -1,11 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Model;
 
-class Label extends AbstractModel
-{
+class Label extends AbstractModel {
     public function __construct(
         public readonly int $id,
         public readonly string $name,
@@ -19,14 +18,13 @@ class Label extends AbstractModel
         public readonly array $urls = [],
         public readonly ?array $images = null,
         public readonly ?array $dataQuality = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
         return new self(
-            id: (int) $data['id'],
-            name: (string) $data['name'],
+            id: (int)$data['id'],
+            name: (string)$data['name'],
             contactInfo: self::getStringOrNull($data, 'contact_info'),
             profile: self::getStringOrNull($data, 'profile'),
             profileViews: self::getIntOrNull($data, 'profileviews'),

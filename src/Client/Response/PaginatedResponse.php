@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Client\Response;
 
@@ -8,8 +8,7 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 
-class PaginatedResponse implements IteratorAggregate, Countable
-{
+class PaginatedResponse implements IteratorAggregate, Countable {
     private array $items;
 
     private int $page;
@@ -35,7 +34,8 @@ class PaginatedResponse implements IteratorAggregate, Countable
         ?string $prevPageUrl = null,
         ?string $firstPageUrl = null,
         ?string $lastPageUrl = null
-    ) {
+    )
+    {
         $this->items = $items;
         $this->page = $page;
         $this->pages = $pages;
@@ -66,24 +66,24 @@ class PaginatedResponse implements IteratorAggregate, Countable
         return $this->perPage;
     }
 
-    public function hasNextPage(): bool
-    {
-        return $this->page < $this->pages;
-    }
-
-    public function hasPrevPage(): bool
-    {
-        return $this->page > 1;
-    }
-
     public function getNextPage(): ?int
     {
         return $this->hasNextPage() ? $this->page + 1 : null;
     }
 
+    public function hasNextPage(): bool
+    {
+        return $this->page < $this->pages;
+    }
+
     public function getPrevPage(): ?int
     {
         return $this->hasPrevPage() ? $this->page - 1 : null;
+    }
+
+    public function hasPrevPage(): bool
+    {
+        return $this->page > 1;
     }
 
     public function getIterator(): ArrayIterator
@@ -104,5 +104,15 @@ class PaginatedResponse implements IteratorAggregate, Countable
     public function getPrevPageUrl(): ?string
     {
         return $this->prevPageUrl;
+    }
+
+    public function getFirstPageUrl(): ?string
+    {
+        return $this->firstPageUrl;
+    }
+
+    public function getLastPageUrl(): ?string
+    {
+        return $this->lastPageUrl;
     }
 }

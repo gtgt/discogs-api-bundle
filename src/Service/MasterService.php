@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Service;
 
@@ -8,8 +8,7 @@ use DiscogsApiBundle\Client\Request\RequestHandler;
 use DiscogsApiBundle\Client\Response\PaginatedResponse;
 use DiscogsApiBundle\Model\Master;
 
-class MasterService
-{
+class MasterService {
     private RequestHandler $requestHandler;
 
     private string $baseUrl;

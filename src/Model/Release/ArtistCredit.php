@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Model\Release;
 
 use DiscogsApiBundle\Model\AbstractModel;
 
-class ArtistCredit extends AbstractModel
-{
+class ArtistCredit extends AbstractModel {
     public function __construct(
         public readonly string $name,
         public readonly ?int $id = null,
@@ -17,13 +16,12 @@ class ArtistCredit extends AbstractModel
         public readonly ?string $tracks = null,
         public readonly ?string $resourceUrl = null,
         public readonly ?string $thumbnailUrl = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
         return new self(
-            name: (string) $data['name'],
+            name: (string)$data['name'],
             id: self::getIntOrNull($data, 'id'),
             anv: self::getStringOrNull($data, 'anv'),
             join: self::getStringOrNull($data, 'join'),

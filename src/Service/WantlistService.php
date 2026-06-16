@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Service;
 
@@ -8,8 +8,7 @@ use DiscogsApiBundle\Client\Request\RequestHandler;
 use DiscogsApiBundle\Client\Response\PaginatedResponse;
 use DiscogsApiBundle\Model\Collection\CollectionItem;
 
-class WantlistService
-{
+class WantlistService {
     private RequestHandler $requestHandler;
 
     private string $baseUrl;
@@ -27,13 +26,13 @@ class WantlistService
         $data = $response->toArray(false);
 
         // Map items to CollectionItem objects for consistency
-        $items = array_map(fn ($item) => CollectionItem::fromArray($item), $data['releases'] ?? $data);
+        $items = array_map(fn($item) => CollectionItem::fromArray($item), $data['releases'] ?? $data);
 
         return new PaginatedResponse(
             $items,
-            (int) ($data['pagination']['page'] ?? 1),
-            (int) ($data['pagination']['pages'] ?? 1),
-            (int) ($data['pagination']['per_page'] ?? count($items)),
+            (int)($data['pagination']['page'] ?? 1),
+            (int)($data['pagination']['pages'] ?? 1),
+            (int)($data['pagination']['per_page'] ?? count($items)),
             $data['pagination']['urls']['next'] ?? null,
             $data['pagination']['urls']['previous'] ?? null
         );

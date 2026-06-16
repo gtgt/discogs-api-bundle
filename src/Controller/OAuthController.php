@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Controller;
 
@@ -17,8 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class OAuthController extends AbstractController
-{
+class OAuthController extends AbstractController {
     private OAuth1Authenticator $oauthServer;
 
     private EventDispatcherInterface $dispatcher;
@@ -70,7 +69,7 @@ class OAuthController extends AbstractController
             'allowed_classes' => [TemporaryCredentials::class],
         ]);
 
-        if (! $temporaryCredentials) {
+        if (!$temporaryCredentials) {
             throw new \RuntimeException('OAuth temporary credentials not found in session');
         }
 
@@ -95,8 +94,8 @@ class OAuthController extends AbstractController
         $session->remove('discogs_oauth_temporary');
 
         return $this->json([
-            'status' => 'success',
-            'token' => $tokenCredentials->getIdentifier(),
+            'status'       => 'success',
+            'token'        => $tokenCredentials->getIdentifier(),
             'token_secret' => $tokenCredentials->getSecret(),
         ]);
     }
@@ -115,7 +114,7 @@ class OAuthController extends AbstractController
             ]);
 
             return $this->json([
-                'token' => $token->getIdentifier(),
+                'token'        => $token->getIdentifier(),
                 'token_secret' => $token->getSecret(),
             ]);
         }

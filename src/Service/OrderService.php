@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Service;
 
@@ -9,8 +9,7 @@ use DiscogsApiBundle\Client\Response\PaginatedResponse;
 use DiscogsApiBundle\Model\Marketplace\Order;
 use DiscogsApiBundle\Model\Marketplace\OrderMessage;
 
-class OrderService
-{
+class OrderService {
     private RequestHandler $requestHandler;
 
     private string $baseUrl;
@@ -23,7 +22,7 @@ class OrderService
 
     public function getOrders(array $options = []): PaginatedResponse
     {
-        $url = $this->baseUrl . '/marketplace/orders';
+        $url = $this->baseUrl.'/marketplace/orders';
         $response = $this->requestHandler->get($url, ['query' => $options]);
         $data = $response->toArray(false);
 

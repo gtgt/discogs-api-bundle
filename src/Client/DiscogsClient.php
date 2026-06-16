@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Client;
 
@@ -17,8 +17,7 @@ use DiscogsApiBundle\Service\SearchService;
 use DiscogsApiBundle\Service\UserService;
 use DiscogsApiBundle\Service\WantlistService;
 
-class DiscogsClient
-{
+class DiscogsClient {
     public function __construct(
         private ArtistService $artistService,
         private ReleaseService $releaseService,
@@ -31,8 +30,7 @@ class DiscogsClient
         private InventoryService $inventoryService,
         private OrderService $orderService,
         private SearchService $searchService,
-    ) {
-    }
+    ) {}
 
     // Artists
     public function getArtist(int $id)
@@ -56,11 +54,6 @@ class DiscogsClient
         return $this->releaseService->getReleaseStats($releaseId);
     }
 
-    public function getReleaseRating(int $releaseId, string $username)
-    {
-        return $this->releaseService->getReleaseRating($releaseId, $username);
-    }
-
     public function setReleaseRating(int $releaseId, int $rating, ?string $username = null)
     {
         $this->releaseService->setReleaseRating($releaseId, $rating, $username);
@@ -71,44 +64,48 @@ class DiscogsClient
         $this->releaseService->deleteReleaseRating($releaseId, $username);
     }
 
-    // Masters
     public function getMaster(int $id, array $options = [])
     {
         return $this->masterService->getMaster($id, $options);
     }
+
+    // Masters
 
     public function getMasterVersions(int $masterId, array $options = [])
     {
         return $this->masterService->getMasterVersions($masterId, $options);
     }
 
-    // Labels
     public function getLabel(int $id, array $options = [])
     {
         return $this->labelService->getLabel($id, $options);
     }
+
+    // Labels
 
     public function getLabelReleases(int $labelId, array $options = [])
     {
         return $this->labelService->getLabelReleases($labelId, $options);
     }
 
-    // Users
     public function getIdentity()
     {
         return $this->userService->getIdentity();
     }
+
+    // Users
 
     public function getUser(string $username)
     {
         return $this->userService->getUser($username);
     }
 
-    // Collection
     public function getCollection(string $username, int $page = 1, int $perPage = 50)
     {
         return $this->collectionService->getCollection($username, $page, $perPage);
     }
+
+    // Collection
 
     public function getCollectionFolders(string $username)
     {
@@ -140,7 +137,13 @@ class DiscogsClient
         return $this->collectionService->getReleaseRating($username, $releaseId);
     }
 
+    public function getReleaseRating(int $releaseId, string $username)
+    {
+        return $this->releaseService->getReleaseRating($releaseId, $username);
+    }
+
     // Wantlist
+
     public function getWantlist(string $username, array $options = [])
     {
         return $this->wantlistService->getWantlist($username, $options);

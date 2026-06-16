@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Exception;
 
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class DiscogsApiException extends \RuntimeException
-{
+class DiscogsApiException extends \RuntimeException {
     private ResponseInterface $response;
 
     public function __construct(string $message, ResponseInterface $response, int $code = 0, ?\Throwable $previous = null)

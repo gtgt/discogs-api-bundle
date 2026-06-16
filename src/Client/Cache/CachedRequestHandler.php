@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Client\Cache;
 
@@ -8,8 +8,7 @@ use DiscogsApiBundle\Client\Request\RequestHandler;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class CachedRequestHandler extends RequestHandler
-{
+class CachedRequestHandler extends RequestHandler {
     private ?CacheItemPoolInterface $cachePool;
 
     private array $ttlConfig;
@@ -21,7 +20,8 @@ class CachedRequestHandler extends RequestHandler
         ?CacheItemPoolInterface $cachePool,
         array $ttlConfig = [],
         ?array $endpointPatterns = null
-    ) {
+    )
+    {
         parent::__construct(
             $innerHandler->getHttpClient(),
             $innerHandler->getAuthenticator(),
@@ -34,6 +34,21 @@ class CachedRequestHandler extends RequestHandler
         $this->cachePool = $cachePool;
         $this->ttlConfig = $ttlConfig;
         $this->endpointPatterns = $endpointPatterns ?? $this->getDefaultPatterns();
+    }
+
+    private function getDefaultPatterns(): array
+    {
+        return [
+            '#^/artists/#'            => $this->ttlConfig['artists'] ?? 3600,
+            '#^/masters/#'            => $this->ttlConfig['masters'] ?? 3600,
+            '#^/labels/#'             => $this->ttlConfig['labels'] ?? 3600,
+            '#^/releases/#'           => $this->ttlConfig['releases'] ?? 1800,
+            '#^/users/.*/collection#' => $this->ttlConfig['collection'] ?? 300,
+            '#^/users/.*/wantlist#'   => $this->ttlConfig['wantlist'] ?? 300,
+            '#^/inventory#'           => $this->ttlConfig['marketplace'] ?? 60,
+            '#^/marketplace/orders#'  => $this->ttlConfig['marketplace'] ?? 60,
+            '#^/database/search#'     => 60, // Short cache for search
+        ];
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
@@ -66,30 +81,6 @@ class CachedRequestHandler extends RequestHandler
         return $response;
     }
 
-    public function post(string $url, array $options = []): ResponseInterface
-    {
-        $response = $this->delegateRequest('POST', $url, $options);
-        $this->invalidateRelatedCache($url, $options);
-
-        return $response;
-    }
-
-    public function put(string $url, array $options = []): ResponseInterface
-    {
-        $response = $this->delegateRequest('PUT', $url, $options);
-        $this->invalidateRelatedCache($url, $options);
-
-        return $response;
-    }
-
-    public function delete(string $url, array $options = []): ResponseInterface
-    {
-        $response = $this->delegateRequest('DELETE', $url, $options);
-        $this->invalidateRelatedCache($url, $options);
-
-        return $response;
-    }
-
     private function delegateRequest(string $method, string $url, array $options): ResponseInterface
     {
         return parent::request($method, $url, $options);
@@ -104,7 +95,7 @@ class CachedRequestHandler extends RequestHandler
             $options['body'] ?? null,
         ];
 
-        return 'discogs_api:' . md5(implode('|', $keyParts));
+        return 'discogs_api:'.md5(implode('|', $keyParts));
     }
 
     private function getTtlForEndpoint(string $url): int
@@ -121,19 +112,12 @@ class CachedRequestHandler extends RequestHandler
         return 300;
     }
 
-    private function getDefaultPatterns(): array
+    public function post(string $url, array $options = []): ResponseInterface
     {
-        return [
-            '#^/artists/#' => $this->ttlConfig['artists'] ?? 3600,
-            '#^/masters/#' => $this->ttlConfig['masters'] ?? 3600,
-            '#^/labels/#' => $this->ttlConfig['labels'] ?? 3600,
-            '#^/releases/#' => $this->ttlConfig['releases'] ?? 1800,
-            '#^/users/.*/collection#' => $this->ttlConfig['collection'] ?? 300,
-            '#^/users/.*/wantlist#' => $this->ttlConfig['wantlist'] ?? 300,
-            '#^/inventory#' => $this->ttlConfig['marketplace'] ?? 60,
-            '#^/marketplace/orders#' => $this->ttlConfig['marketplace'] ?? 60,
-            '#^/database/search#' => 60, // Short cache for search
-        ];
+        $response = $this->delegateRequest('POST', $url, $options);
+        $this->invalidateRelatedCache($url, $options);
+
+        return $response;
     }
 
     private function invalidateRelatedCache(string $url, array $options): void
@@ -154,5 +138,21 @@ class CachedRequestHandler extends RequestHandler
             // For now, clear entire cache on writes as a safe operation
             $this->cachePool->clear();
         }
+    }
+
+    public function put(string $url, array $options = []): ResponseInterface
+    {
+        $response = $this->delegateRequest('PUT', $url, $options);
+        $this->invalidateRelatedCache($url, $options);
+
+        return $response;
+    }
+
+    public function delete(string $url, array $options = []): ResponseInterface
+    {
+        $response = $this->delegateRequest('DELETE', $url, $options);
+        $this->invalidateRelatedCache($url, $options);
+
+        return $response;
     }
 }

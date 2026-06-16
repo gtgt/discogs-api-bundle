@@ -1,18 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Service;
 
 use DiscogsApiBundle\Client\Request\RequestHandler;
 use DiscogsApiBundle\Client\Response\PaginatedResponse;
-use DiscogsApiBundle\Model\Artist;
-use DiscogsApiBundle\Model\Label;
-use DiscogsApiBundle\Model\Master;
-use DiscogsApiBundle\Model\Release;
 
-class SearchService
-{
+class SearchService {
     private RequestHandler $requestHandler;
 
     private string $baseUrl;
@@ -24,13 +19,24 @@ class SearchService
     }
 
     /**
+     * Search for artists only
+     */
+    public function searchArtists(string $query, array $options = []): PaginatedResponse
+    {
+        $options['type'] = 'artist';
+
+        return $this->search($query, $options);
+    }
+
+    /**
      * Search Discogs database
      *
      * @param string $query Search query
      * @param array $options {
      *
-     *     @var string|null $type Filter by type: 'artist', 'release', 'master', 'label'
-     *     @var string|null $title Filter by title
+     * @return PaginatedResponse<array{type: string, id: int, title: string, thumb?: string}>
+     * @var string|null $type Filter by type: 'artist', 'release', 'master', 'label'
+     * @var string|null $title Filter by title
      * @var string|null $releaseTitle Filter by release title
      * @var string|null $credit Filter by credit (artist name)
      * @var string|null $artist Filter by artist
@@ -50,11 +56,10 @@ class SearchService
      * @var int $per_page Results per page (default 50, max 100)
      * }
      *
-     * @return PaginatedResponse<array{type: string, id: int, title: string, thumb?: string}>
      */
     public function search(string $query, array $options = []): PaginatedResponse
     {
-        $url = $this->baseUrl . '/database/search';
+        $url = $this->baseUrl.'/database/search';
         $queryParams = array_merge(['q' => $query], $options);
 
         $response = $this->requestHandler->get($url, ['query' => $queryParams]);
@@ -65,16 +70,6 @@ class SearchService
         // Map results to simple DTOs (each result has type, id, title, thumb)
         // The actual model objects would require fetching each individually
         return $paginated;
-    }
-
-    /**
-     * Search for artists only
-     */
-    public function searchArtists(string $query, array $options = []): PaginatedResponse
-    {
-        $options['type'] = 'artist';
-
-        return $this->search($query, $options);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Client\Request;
 
@@ -18,8 +18,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class RequestHandler
-{
+class RequestHandler {
     private HttpClientInterface $httpClient;
 
     private ?AuthenticatorInterface $authenticator;
@@ -48,7 +47,8 @@ class RequestHandler
         ?CacheItemPoolInterface $cachePool = null,
         array $cacheTtl = [],
         ?array $endpointPatterns = null
-    ) {
+    )
+    {
         $this->httpClient = $httpClient;
         $this->authenticator = $authenticator;
         $this->dispatcher = $dispatcher;
@@ -63,61 +63,21 @@ class RequestHandler
     private function getDefaultPatterns(): array
     {
         return [
-            '#^/artists/#' => $this->cacheTtl['artists'] ?? 3600,
-            '#^/masters/#' => $this->cacheTtl['masters'] ?? 3600,
-            '#^/labels/#' => $this->cacheTtl['labels'] ?? 3600,
-            '#^/releases/#' => $this->cacheTtl['releases'] ?? 1800,
+            '#^/artists/#'            => $this->cacheTtl['artists'] ?? 3600,
+            '#^/masters/#'            => $this->cacheTtl['masters'] ?? 3600,
+            '#^/labels/#'             => $this->cacheTtl['labels'] ?? 3600,
+            '#^/releases/#'           => $this->cacheTtl['releases'] ?? 1800,
             '#^/users/.*/collection#' => $this->cacheTtl['collection'] ?? 300,
-            '#^/users/.*/wantlist#' => $this->cacheTtl['wantlist'] ?? 300,
-            '#^/inventory#' => $this->cacheTtl['marketplace'] ?? 60,
-            '#^/marketplace/orders#' => $this->cacheTtl['marketplace'] ?? 60,
-            '#^/database/search#' => 60,
+            '#^/users/.*/wantlist#'   => $this->cacheTtl['wantlist'] ?? 300,
+            '#^/inventory#'           => $this->cacheTtl['marketplace'] ?? 60,
+            '#^/marketplace/orders#'  => $this->cacheTtl['marketplace'] ?? 60,
+            '#^/database/search#'     => 60,
         ];
     }
 
-    private function prepareRequestOptions(string $method, string $url, array $options): array
+    public function post(string $url, array $options = []): ResponseInterface
     {
-        $requestOptions = $options;
-
-        // Apply authentication if available
-        if ($this->authenticator) {
-            $this->authenticator->authenticate($this->httpClient, $url, $requestOptions);
-        }
-
-        // Set User-Agent
-        $requestOptions['headers'] = array_merge($requestOptions['headers'] ?? [], [
-            'User-Agent' => $this->userAgent,
-        ]);
-
-        return $requestOptions;
-    }
-
-    private function generateCacheKey(string $method, string $url, array $options): string
-    {
-        $keyParts = [
-            $method,
-            $url,
-            http_build_query($options['query'] ?? []),
-            isset($options['body']) ? json_encode($options['body']) : null,
-        ];
-
-        return 'discogs_api:' . md5(implode('|', $keyParts));
-    }
-
-    private function getTtlForEndpoint(string $url): int
-    {
-        $path = parse_url($url, PHP_URL_PATH);
-        if ($path === null) {
-            return 300;
-        }
-
-        foreach ($this->endpointPatterns as $pattern => $ttl) {
-            if (preg_match($pattern, $path)) {
-                return $ttl;
-            }
-        }
-
-        return 300;
+        return $this->request('POST', $url, $options);
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
@@ -133,8 +93,8 @@ class RequestHandler
                 $cached = $cachedItem->get();
                 $headers = [];
                 foreach ($cached['headers'] as $name => $values) {
-                    foreach ((array) $values as $value) {
-                        $headers[] = $name . ': ' . $value;
+                    foreach ((array)$values as $value) {
+                        $headers[] = $name.': '.$value;
                     }
                 }
 
@@ -192,7 +152,7 @@ class RequestHandler
                 if ($method === 'GET' && $statusCode === 200 && $this->cachePool !== null) {
                     $cachedData = [
                         'content' => $response->getContent(),
-                        'status' => $statusCode,
+                        'status'  => $statusCode,
                         'headers' => $response->getHeaders(),
                     ];
                     $cachedItem = $this->cachePool->getItem($cacheKey);
@@ -222,6 +182,60 @@ class RequestHandler
         }
     }
 
+    private function prepareRequestOptions(string $method, string $url, array $options): array
+    {
+        $requestOptions = $options;
+
+        // Apply authentication if available
+        if ($this->authenticator) {
+            $this->authenticator->authenticate($this->httpClient, $url, $requestOptions);
+        }
+
+        // Set User-Agent
+        $requestOptions['headers'] = array_merge($requestOptions['headers'] ?? [], [
+            'User-Agent' => $this->userAgent,
+        ]);
+
+        return $requestOptions;
+    }
+
+    private function generateCacheKey(string $method, string $url, array $options): string
+    {
+        $keyParts = [
+            $method,
+            $url,
+            http_build_query($options['query'] ?? []),
+            isset($options['body']) ? json_encode($options['body']) : null,
+        ];
+
+        return 'discogs_api:'.md5(implode('|', $keyParts));
+    }
+
+    public function get(string $url, array $options = []): ResponseInterface
+    {
+        return $this->request('GET', $url, $options);
+    }
+
+    private function parseRetryAfter(ResponseInterface $response): ?int
+    {
+        $headers = $response->getHeaders();
+
+        if ($this->enableRateLimitHeader) {
+            $retryAfter = $headers['x-ratelimit-reset'][0] ?? null;
+            if ($retryAfter) {
+                $timestamp = (int)($retryAfter ?? 0);
+                $now = time();
+                $diff = $timestamp - $now;
+
+                return $diff > 0 ? $diff : null;
+            }
+        }
+
+        $retryAfterHeader = $headers['retry-after'][0] ?? null;
+
+        return $retryAfterHeader !== null ? (int)$retryAfterHeader : null;
+    }
+
     private function handleErrorResponse(ResponseInterface $response, int $statusCode): void
     {
         $content = $response->getContent(false);
@@ -229,7 +243,7 @@ class RequestHandler
         switch ($statusCode) {
             case 401:
             case 403:
-                $exception = new AuthenticationException($response, 'Authentication failed: ' . $content);
+                $exception = new AuthenticationException($response, 'Authentication failed: '.$content);
                 break;
             case 404:
                 $exception = new NotFoundException($response, 'Resource not found');
@@ -241,11 +255,11 @@ class RequestHandler
                     $errors = $data['message'] ?? $data['errors'] ?? [];
                 } catch (\Throwable) {
                 }
-                $exception = new ValidationException($response, (array) $errors);
+                $exception = new ValidationException($response, (array)$errors);
                 break;
             default:
                 $exception = new DiscogsApiException(
-                    'API error: ' . $content,
+                    'API error: '.$content,
                     $response,
                     $statusCode
                 );
@@ -261,34 +275,20 @@ class RequestHandler
         throw $exception;
     }
 
-    private function parseRetryAfter(ResponseInterface $response): ?int
+    private function getTtlForEndpoint(string $url): int
     {
-        $headers = $response->getHeaders();
+        $path = parse_url($url, PHP_URL_PATH);
+        if ($path === null) {
+            return 300;
+        }
 
-        if ($this->enableRateLimitHeader) {
-            $retryAfter = $headers['x-ratelimit-reset'][0] ?? null;
-            if ($retryAfter) {
-                $timestamp = (int) ($retryAfter ?? 0);
-                $now = time();
-                $diff = $timestamp - $now;
-
-                return $diff > 0 ? $diff : null;
+        foreach ($this->endpointPatterns as $pattern => $ttl) {
+            if (preg_match($pattern, $path)) {
+                return $ttl;
             }
         }
 
-        $retryAfterHeader = $headers['retry-after'][0] ?? null;
-
-        return $retryAfterHeader !== null ? (int) $retryAfterHeader : null;
-    }
-
-    public function get(string $url, array $options = []): ResponseInterface
-    {
-        return $this->request('GET', $url, $options);
-    }
-
-    public function post(string $url, array $options = []): ResponseInterface
-    {
-        return $this->request('POST', $url, $options);
+        return 300;
     }
 
     public function put(string $url, array $options = []): ResponseInterface

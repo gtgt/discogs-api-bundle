@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Service;
 
@@ -8,8 +8,7 @@ use DiscogsApiBundle\Client\Request\RequestHandler;
 use DiscogsApiBundle\Client\Response\PaginatedResponse;
 use DiscogsApiBundle\Model\Marketplace\Listing;
 
-class InventoryService
-{
+class InventoryService {
     private RequestHandler $requestHandler;
 
     private string $baseUrl;
@@ -58,11 +57,11 @@ class InventoryService
      */
     public function createListing(int $releaseId, string $condition, float $price, array $options = []): Listing
     {
-        $url = $this->baseUrl . '/inventory/listings';
+        $url = $this->baseUrl.'/inventory/listings';
         $body = array_merge([
             'release_id' => $releaseId,
-            'condition' => $condition,
-            'price' => $price,
+            'condition'  => $condition,
+            'price'      => $price,
         ], $options);
 
         $response = $this->requestHandler->post($url, ['json' => $body]);
@@ -79,7 +78,7 @@ class InventoryService
         $url = sprintf('%s/inventory/listings/%s', $this->baseUrl, $listingId);
         $body = array_merge([
             'condition' => $condition,
-            'price' => $price,
+            'price'     => $price,
         ], $options);
 
         $response = $this->requestHandler->put($url, ['json' => $body]);

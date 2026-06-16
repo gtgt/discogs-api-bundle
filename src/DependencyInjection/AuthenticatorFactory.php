@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\DependencyInjection;
 
@@ -10,8 +10,7 @@ use DiscogsApiBundle\Client\Authenticator\UserTokenAuthenticator;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class AuthenticatorFactory
-{
+class AuthenticatorFactory {
     public static function create(array $config, ?EventDispatcherInterface $dispatcher): AuthenticatorInterface
     {
         $userToken = $config['user_token']['token'] ?? null;

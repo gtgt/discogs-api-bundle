@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Client\Authenticator;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class UserTokenAuthenticator implements AuthenticatorInterface
-{
+final class UserTokenAuthenticator implements AuthenticatorInterface {
     private string $token;
 
     public function __construct(string $token)

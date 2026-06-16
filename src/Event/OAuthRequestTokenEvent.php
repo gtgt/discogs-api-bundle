@@ -1,14 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Event;
 
 use League\OAuth1\Client\Credentials\TemporaryCredentials;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class OAuthRequestTokenEvent extends Event
-{
+class OAuthRequestTokenEvent extends Event {
     private TemporaryCredentials $temporaryCredentials;
 
     private ?string $callbackUrl;

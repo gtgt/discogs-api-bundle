@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Model\Marketplace;
 
 use DiscogsApiBundle\Model\AbstractModel;
 
-class Order extends AbstractModel
-{
+class Order extends AbstractModel {
     public const STATUS_PENDING = 'pending';
 
     public const STATUS_PAID = 'paid';
@@ -28,17 +27,16 @@ class Order extends AbstractModel
         public readonly ?\DateTimeImmutable $created,
         public readonly ?\DateTimeImmutable $lastActivity,
         public readonly array $items = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
         return new self(
-            id: (int) $data['id'],
-            status: (string) $data['status'],
+            id: (int)$data['id'],
+            status: (string)$data['status'],
             buyer: self::getStringOrNull($data, 'buyer'),
             seller: self::getStringOrNull($data, 'seller'),
-            total: isset($data['total']) ? (float) $data['total'] : null,
+            total: isset($data['total']) ? (float)$data['total'] : null,
             currency: self::getStringOrNull($data, 'currency'),
             created: self::getDateTimeImmutableOrNull($data, 'created'),
             lastActivity: self::getDateTimeImmutableOrNull($data, 'last_activity'),

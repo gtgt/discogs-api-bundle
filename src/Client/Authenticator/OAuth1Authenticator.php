@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Client\Authenticator;
 
@@ -9,15 +9,15 @@ use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Server\Server as BaseServer;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class OAuth1Authenticator extends BaseServer implements AuthenticatorInterface
-{
+final class OAuth1Authenticator extends BaseServer implements AuthenticatorInterface {
     private ?TokenCredentials $tokenCredentials = null;
 
     public function __construct(
         private string $identifier,
         private string $secret,
         private string $callbackUri,
-    ) {
+    )
+    {
         parent::__construct(['identifier' => $this->identifier, 'secret' => $this->secret, 'callback_uri' => $this->callbackUri]);
     }
 
@@ -42,13 +42,13 @@ final class OAuth1Authenticator extends BaseServer implements AuthenticatorInter
 
         // Add OAuth headers
         $headers = [
-            'Authorization: OAuth ' .
-            'oauth_consumer_key="' . $this->identifier . '", ' .
-            'oauth_token="' . $this->tokenCredentials->getIdentifier() . '", ' .
-            'oauth_signature_method="PLAINTEXT", ' .
-            'oauth_signature="' . rawurlencode($this->secret) . '&' . rawurlencode($this->tokenCredentials->getSecret()) . '", ' .
-            'oauth_timestamp="' . time() . '", ' .
-            'oauth_nonce="' . bin2hex(random_bytes(16)) . '", ' .
+            'Authorization: OAuth '.
+            'oauth_consumer_key="'.$this->identifier.'", '.
+            'oauth_token="'.$this->tokenCredentials->getIdentifier().'", '.
+            'oauth_signature_method="PLAINTEXT", '.
+            'oauth_signature="'.rawurlencode($this->secret).'&'.rawurlencode($this->tokenCredentials->getSecret()).'", '.
+            'oauth_timestamp="'.time().'", '.
+            'oauth_nonce="'.bin2hex(random_bytes(16)).'", '.
             'oauth_version="1.0"',
         ];
 
@@ -61,21 +61,17 @@ final class OAuth1Authenticator extends BaseServer implements AuthenticatorInter
             return null;
         }
 
-        return 'OAuth ' .
-            'oauth_consumer_key="' . $this->identifier . '", ' .
-            'oauth_token="' . $this->tokenCredentials->getIdentifier() . '", ' .
-            'oauth_signature_method="PLAINTEXT", ' .
-            'oauth_signature="' . rawurlencode($this->secret) . '&' . rawurlencode($this->tokenCredentials->getSecret()) . '", ' .
-            'oauth_timestamp="' . time() . '", ' .
-            'oauth_nonce="' . bin2hex(random_bytes(16)) . '", ' .
+        return 'OAuth '.
+            'oauth_consumer_key="'.$this->identifier.'", '.
+            'oauth_token="'.$this->tokenCredentials->getIdentifier().'", '.
+            'oauth_signature_method="PLAINTEXT", '.
+            'oauth_signature="'.rawurlencode($this->secret).'&'.rawurlencode($this->tokenCredentials->getSecret()).'", '.
+            'oauth_timestamp="'.time().'", '.
+            'oauth_nonce="'.bin2hex(random_bytes(16)).'", '.
             'oauth_version="1.0"';
     }
 
     // Override to use Discogs-specific URLs
-    protected function getTemporaryCredentialsUrl(): string
-    {
-        return 'https://api.discogs.com/oauth/request_token';
-    }
 
     public function getAuthorizationUrl($temporaryIdentifier, array $options = []): string
     {
@@ -83,19 +79,24 @@ final class OAuth1Authenticator extends BaseServer implements AuthenticatorInter
             ? $temporaryIdentifier->getIdentifier()
             : $temporaryIdentifier;
 
-        return 'https://www.discogs.com/oauth/authorize?' . http_build_query([
-            'oauth_token' => $token,
-        ]);
+        return 'https://www.discogs.com/oauth/authorize?'.http_build_query([
+                'oauth_token' => $token,
+            ]);
     }
 
-    protected function getAccessTokenUrl(): string
+    public function urlTemporaryCredentials(): string
     {
-        return 'https://api.discogs.com/oauth/access_token';
+        return $this->getTemporaryCredentialsUrl();
     }
 
-    protected function getBaseUrl(): string
+    protected function getTemporaryCredentialsUrl(): string
     {
-        return 'https://api.discogs.com';
+        return 'https://api.discogs.com/oauth/request_token';
+    }
+
+    public function urlAuthorization(): string
+    {
+        return $this->getBaseAuthorizationUrl().'/authorize';
     }
 
     protected function getBaseAuthorizationUrl(): string
@@ -103,31 +104,26 @@ final class OAuth1Authenticator extends BaseServer implements AuthenticatorInter
         return 'https://www.discogs.com/oauth';
     }
 
-    protected function contentType(): string
-    {
-        return 'application/x-www-form-urlencoded';
-    }
-
-    // ---- Abstract method implementations required by League\OAuth1\Client\Server\Server ----
-
-    public function urlTemporaryCredentials(): string
-    {
-        return $this->getTemporaryCredentialsUrl();
-    }
-
-    public function urlAuthorization(): string
-    {
-        return $this->getBaseAuthorizationUrl() . '/authorize';
-    }
-
     public function urlTokenCredentials(): string
     {
         return $this->getAccessTokenUrl();
     }
 
+    // ---- Abstract method implementations required by League\OAuth1\Client\Server\Server ----
+
+    protected function getAccessTokenUrl(): string
+    {
+        return 'https://api.discogs.com/oauth/access_token';
+    }
+
     public function urlUserDetails(): string
     {
-        return $this->getBaseUrl() . '/oauth/identity';
+        return $this->getBaseUrl().'/oauth/identity';
+    }
+
+    protected function getBaseUrl(): string
+    {
+        return 'https://api.discogs.com';
     }
 
     public function userDetails($data, TokenCredentials $tokenCredentials): \League\OAuth1\Client\Server\User
@@ -161,5 +157,10 @@ final class OAuth1Authenticator extends BaseServer implements AuthenticatorInter
     public function userScreenName($data, TokenCredentials $tokenCredentials): ?string
     {
         return $data['username'] ?? null;
+    }
+
+    protected function contentType(): string
+    {
+        return 'application/x-www-form-urlencoded';
     }
 }

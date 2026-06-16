@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Service;
 
@@ -9,8 +9,7 @@ use DiscogsApiBundle\Client\Response\PaginatedResponse;
 use DiscogsApiBundle\Exception\NotFoundException;
 use DiscogsApiBundle\Model\Collection\CollectionFolder;
 
-class CollectionService
-{
+class CollectionService {
     private RequestHandler $requestHandler;
 
     private string $baseUrl;
@@ -97,7 +96,7 @@ class CollectionService
             $response = $this->requestHandler->get($url);
             $data = $response->toArray(false);
 
-            return isset($data['rating']) ? (int) $data['rating'] : null;
+            return isset($data['rating']) ? (int)$data['rating'] : null;
         } catch (NotFoundException $e) {
             return null;
         }

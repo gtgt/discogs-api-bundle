@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle;
 
@@ -8,8 +8,7 @@ use DiscogsApiBundle\DependencyInjection\DiscogsApiExtension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-class DiscogsApiBundle extends AbstractBundle
-{
+class DiscogsApiBundle extends AbstractBundle {
     public function getPath(): string
     {
         return \dirname(__DIR__);

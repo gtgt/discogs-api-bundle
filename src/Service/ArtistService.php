@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Service;
 
@@ -8,8 +8,7 @@ use DiscogsApiBundle\Client\Request\RequestHandler;
 use DiscogsApiBundle\Client\Response\PaginatedResponse;
 use DiscogsApiBundle\Model\Artist;
 
-class ArtistService
-{
+class ArtistService {
     private RequestHandler $requestHandler;
 
     private string $baseUrl;
@@ -52,7 +51,7 @@ class ArtistService
 
     public function search(string $query, array $options = []): PaginatedResponse
     {
-        $url = $this->baseUrl . '/database/search';
+        $url = $this->baseUrl.'/database/search';
         $response = $this->requestHandler->get($url, [
             'query' => array_merge(['q' => $query], $options),
         ]);

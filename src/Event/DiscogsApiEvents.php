@@ -1,11 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Event;
 
-abstract class DiscogsApiEvents
-{
+abstract class DiscogsApiEvents {
     public const REQUEST_BEFORE = 'discogs_api.request.before';
 
     public const REQUEST_AFTER = 'discogs_api.request.after';

@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Model\Release;
 
 use DiscogsApiBundle\Model\AbstractModel;
 
-class ReleaseLabel extends AbstractModel
-{
+class ReleaseLabel extends AbstractModel {
     public function __construct(
         public readonly int $id,
         public readonly string $name,
@@ -16,14 +15,13 @@ class ReleaseLabel extends AbstractModel
         public readonly ?string $entityTypeName = null,
         public readonly ?string $resourceUrl = null,
         public readonly ?string $thumbnailUrl = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
         return new self(
-            id: (int) ($data['id'] ?? 0),
-            name: (string) $data['name'],
+            id: (int)($data['id'] ?? 0),
+            name: (string)$data['name'],
             catno: self::getStringOrNull($data, 'catno'),
             entityType: self::getStringOrNull($data, 'entity_type'),
             entityTypeName: self::getStringOrNull($data, 'entity_type_name'),

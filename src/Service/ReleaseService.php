@@ -1,14 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Service;
 
 use DiscogsApiBundle\Client\Request\RequestHandler;
 use DiscogsApiBundle\Model\Release;
 
-class ReleaseService
-{
+class ReleaseService {
     private RequestHandler $requestHandler;
 
     private string $baseUrl;

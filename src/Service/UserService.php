@@ -1,14 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Service;
 
 use DiscogsApiBundle\Client\Request\RequestHandler;
 use DiscogsApiBundle\Model\User;
 
-class UserService
-{
+class UserService {
     private RequestHandler $requestHandler;
 
     private string $baseUrl;
@@ -21,7 +20,7 @@ class UserService
 
     public function getIdentity(): User
     {
-        $url = $this->baseUrl . '/oauth/identity';
+        $url = $this->baseUrl.'/oauth/identity';
         $response = $this->requestHandler->get($url);
         $data = $response->toArray(false);
 

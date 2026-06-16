@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\DependencyInjection;
 
@@ -9,8 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class DiscogsApiExtension extends Extension
-{
+class DiscogsApiExtension extends Extension {
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
@@ -20,14 +19,14 @@ class DiscogsApiExtension extends Extension
         $this->setConfigAsParameter('discogs_api.config', $config, $container);
 
         // Load services
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.yaml');
     }
 
     private function setConfigAsParameter(string $prefix, array $config, ContainerBuilder $container)
     {
         foreach ($config as $key => $value) {
-            is_array($value) ? $this->setConfigAsParameter($prefix . '.' . $key, $value, $container) : $container->setParameter($prefix . '.' . $key, $value);
+            is_array($value) ? $this->setConfigAsParameter($prefix.'.'.$key, $value, $container) : $container->setParameter($prefix.'.'.$key, $value);
         }
         $container->setParameter($prefix, $config);
     }

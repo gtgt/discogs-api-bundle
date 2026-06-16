@@ -1,14 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Event;
 
 use DiscogsApiBundle\Exception\DiscogsApiException;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ErrorEvent extends Event
-{
+class ErrorEvent extends Event {
     private DiscogsApiException $exception;
 
     public function __construct(DiscogsApiException $exception)

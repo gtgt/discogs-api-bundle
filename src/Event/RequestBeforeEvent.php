@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class RequestBeforeEvent extends Event
-{
+class RequestBeforeEvent extends Event {
     private string $method;
 
     private string $url;

@@ -1,19 +1,18 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Client\Request;
 
 use DiscogsApiBundle\Client\Response\PaginatedResponse;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class RequestFactory
-{
+class RequestFactory {
     public static function createPaginatedResponse(array $data, ResponseInterface $response): PaginatedResponse
     {
-        $page = (int) ($data['pagination']['page'] ?? 1);
-        $pages = (int) ($data['pagination']['pages'] ?? 1);
-        $perPage = (int) ($data['pagination']['per_page'] ?? count($data['releases'] ?? $data['artists'] ?? $data['results'] ?? []));
+        $page = (int)($data['pagination']['page'] ?? 1);
+        $pages = (int)($data['pagination']['pages'] ?? 1);
+        $perPage = (int)($data['pagination']['per_page'] ?? count($data['releases'] ?? $data['artists'] ?? $data['results'] ?? []));
         $nextPageUrl = $data['pagination']['urls']['next'] ?? null;
         $prevPageUrl = $data['pagination']['urls']['previous'] ?? null;
 

@@ -1,11 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Model;
 
-class User extends AbstractModel
-{
+class User extends AbstractModel {
     public function __construct(
         public readonly int $id,
         public readonly string $username,
@@ -19,14 +18,13 @@ class User extends AbstractModel
         public readonly ?array $wantlist = null,
         public readonly ?array $collection = null,
         public readonly array $folderIds = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
         return new self(
-            id: (int) $data['id'],
-            username: (string) $data['username'],
+            id: (int)$data['id'],
+            username: (string)$data['username'],
             name: self::getStringOrNull($data, 'name'),
             avatarUrl: self::getStringOrNull($data, 'avatar_url'),
             resourceUrl: self::getStringOrNull($data, 'resource_url'),

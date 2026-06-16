@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DiscogsApiBundle\Model;
 
 use DiscogsApiBundle\Model\Community\ReleaseCommunity;
 use DiscogsApiBundle\Model\Community\Stats;
 use DiscogsApiBundle\Model\Release\ReleaseCompany;
-use DiscogsApiBundle\Model\Release\ReleaseFormat;
 use DiscogsApiBundle\Model\Release\ReleaseIdentifier;
 use DiscogsApiBundle\Model\Release\ReleaseImage;
 use DiscogsApiBundle\Model\Release\ReleaseLabel;
@@ -15,17 +14,16 @@ use DiscogsApiBundle\Model\Release\ReleaseSeries;
 use DiscogsApiBundle\Model\Release\ReleaseVideo;
 use DiscogsApiBundle\Model\Release\Track;
 
-class Release extends AbstractModel
-{
+class Release extends AbstractModel {
     /**
-     * @param ReleaseLabel[]      $labels
-     * @param ReleaseSeries[]     $series
-     * @param ReleaseFormat[]     $formats
-     * @param ReleaseImage[]      $images
+     * @param ReleaseLabel[] $labels
+     * @param ReleaseSeries[] $series
+     * @param Format[] $formats
+     * @param ReleaseImage[] $images
      * @param ReleaseVideo[]|null $videos
      * @param ReleaseCompany[]|null $companies
      * @param ReleaseIdentifier[]|null $identifiers
-     * @param Track[]|null        $tracklist
+     * @param Track[]|null $tracklist
      */
     public function __construct(
         public readonly int $id,
@@ -58,14 +56,13 @@ class Release extends AbstractModel
         public readonly ?ReleaseCommunity $community = null,
         public readonly ?Stats $statistics = null,
         public readonly ?string $resourceUrl = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
         return new self(
-            id: (int) $data['id'],
-            title: (string) $data['title'],
+            id: (int)$data['id'],
+            title: (string)$data['title'],
             description: self::getStringOrNull($data, 'description'),
             dataQuality: self::getStringOrNull($data, 'data_quality'),
             year: self::getIntOrNull($data, 'year'),
@@ -75,10 +72,10 @@ class Release extends AbstractModel
             styles: $data['styles'] ?? [],
             labels: self::mapModels($data['labels'] ?? [], ReleaseLabel::class),
             series: self::mapModels($data['series'] ?? [], ReleaseSeries::class),
-            artists: $data['artists'] ?? [],
+            artists: self::mapModels($data['artists'] ?? [], Artist::class),
             master: isset($data['master']) ? Master::fromArray($data['master']) : null,
             mainReleaseId: $data['main_release'] ?? null,
-            formats: self::mapModels($data['formats'] ?? [], ReleaseFormat::class),
+            formats: self::mapModels($data['formats'] ?? [], Format::class),
             formatQuantity: self::getIntOrNull($data, 'format_quantity'),
             catno: self::getStringOrNull($data, 'catno'),
             barcode: self::getStringOrNull($data, 'barcode'),
@@ -95,36 +92,5 @@ class Release extends AbstractModel
             statistics: isset($data['stats']) ? Stats::fromArray($data['stats']) : null,
             resourceUrl: self::getStringOrNull($data, 'resource_url'),
         );
-    }
-
-    /**
-     * @template T of AbstractModel
-     *
-     * @param class-string<T> $modelClass
-     *
-     * @return T[]
-     */
-    private static function mapModels(array $items, string $modelClass): array
-    {
-        return array_map(
-            static fn (array $item) => $modelClass::fromArray($item),
-            $items,
-        );
-    }
-
-    /**
-     * @template T of AbstractModel
-     *
-     * @param class-string<T> $modelClass
-     *
-     * @return T[]|null
-     */
-    private static function mapModelsOrNull(?array $items, string $modelClass): ?array
-    {
-        if ($items === null) {
-            return null;
-        }
-
-        return self::mapModels($items, $modelClass);
     }
 }
