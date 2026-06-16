@@ -6,9 +6,27 @@ namespace DiscogsApiBundle\Model;
 
 use DiscogsApiBundle\Model\Community\ReleaseCommunity;
 use DiscogsApiBundle\Model\Community\Stats;
+use DiscogsApiBundle\Model\Release\ReleaseCompany;
+use DiscogsApiBundle\Model\Release\ReleaseFormat;
+use DiscogsApiBundle\Model\Release\ReleaseIdentifier;
+use DiscogsApiBundle\Model\Release\ReleaseImage;
+use DiscogsApiBundle\Model\Release\ReleaseLabel;
+use DiscogsApiBundle\Model\Release\ReleaseSeries;
+use DiscogsApiBundle\Model\Release\ReleaseVideo;
+use DiscogsApiBundle\Model\Release\Track;
 
 class Release extends AbstractModel
 {
+    /**
+     * @param ReleaseLabel[]      $labels
+     * @param ReleaseSeries[]     $series
+     * @param ReleaseFormat[]     $formats
+     * @param ReleaseImage[]      $images
+     * @param ReleaseVideo[]|null $videos
+     * @param ReleaseCompany[]|null $companies
+     * @param ReleaseIdentifier[]|null $identifiers
+     * @param Track[]|null        $tracklist
+     */
     public function __construct(
         public readonly int $id,
         public readonly string $title,
@@ -20,6 +38,7 @@ class Release extends AbstractModel
         public readonly array $genres = [],
         public readonly array $styles = [],
         public readonly array $labels = [],
+        public readonly array $series = [],
         public readonly array $artists = [],
         public readonly ?Master $master = null,
         public readonly ?string $mainReleaseId = null,
@@ -54,26 +73,58 @@ class Release extends AbstractModel
             country: self::getStringOrNull($data, 'country'),
             genres: $data['genres'] ?? [],
             styles: $data['styles'] ?? [],
-            labels: $data['labels'] ?? [],
+            labels: self::mapModels($data['labels'] ?? [], ReleaseLabel::class),
+            series: self::mapModels($data['series'] ?? [], ReleaseSeries::class),
             artists: $data['artists'] ?? [],
             master: isset($data['master']) ? Master::fromArray($data['master']) : null,
             mainReleaseId: $data['main_release'] ?? null,
-            formats: $data['formats'] ?? [],
+            formats: self::mapModels($data['formats'] ?? [], ReleaseFormat::class),
             formatQuantity: self::getIntOrNull($data, 'format_quantity'),
             catno: self::getStringOrNull($data, 'catno'),
             barcode: self::getStringOrNull($data, 'barcode'),
             thumb: self::getStringOrNull($data, 'thumb'),
             coverImage: self::getStringOrNull($data, 'cover_image'),
-            images: $data['images'] ?? [],
-            videos: $data['videos'] ?? null,
-            companies: $data['companies'] ?? null,
-            identifiers: $data['identifiers'] ?? null,
-            tracklist: $data['tracklist'] ?? null,
+            images: self::mapModels($data['images'] ?? [], ReleaseImage::class),
+            videos: self::mapModelsOrNull($data['videos'] ?? null, ReleaseVideo::class),
+            companies: self::mapModelsOrNull($data['companies'] ?? null, ReleaseCompany::class),
+            identifiers: self::mapModelsOrNull($data['identifiers'] ?? null, ReleaseIdentifier::class),
+            tracklist: self::mapModelsOrNull($data['tracklist'] ?? null, Track::class),
             extraArtists: $data['extraartists'] ?? null,
             notes: $data['notes'] ?? null,
             community: isset($data['community']) ? ReleaseCommunity::fromArray($data['community']) : null,
             statistics: isset($data['stats']) ? Stats::fromArray($data['stats']) : null,
             resourceUrl: self::getStringOrNull($data, 'resource_url'),
         );
+    }
+
+    /**
+     * @template T of AbstractModel
+     *
+     * @param class-string<T> $modelClass
+     *
+     * @return T[]
+     */
+    private static function mapModels(array $items, string $modelClass): array
+    {
+        return array_map(
+            static fn (array $item) => $modelClass::fromArray($item),
+            $items,
+        );
+    }
+
+    /**
+     * @template T of AbstractModel
+     *
+     * @param class-string<T> $modelClass
+     *
+     * @return T[]|null
+     */
+    private static function mapModelsOrNull(?array $items, string $modelClass): ?array
+    {
+        if ($items === null) {
+            return null;
+        }
+
+        return self::mapModels($items, $modelClass);
     }
 }
