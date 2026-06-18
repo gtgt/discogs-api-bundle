@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace DiscogsApiBundle\Model\Collection;
 
-use DiscogsApiBundle\Model\AbstractModel;
-use DiscogsApiBundle\Model\Artist;
-use DiscogsApiBundle\Model\Format;
+use DiscogsApiBundle\Model\{AbstractModel, Artist, FieldData, Format};
 
 class CollectionItem extends AbstractModel {
     /**
      * @param Format[] $formats
      * @param Artist[] $artists
+     * @param FieldData[] $fields
      */
     public function __construct(
         public readonly int $id,
         public readonly ?string $title,
-        public readonly ?array $formats,
+        public readonly array $formats,
         public readonly ?string $coverImage,
-        public readonly ?array $artists,
+        public readonly array $artists,
         public readonly ?float $rating,
-        public readonly ?array $fields,
+        public readonly array $fields,
         public readonly ?string $dateAdded,
         public readonly ?string $resourceUrl,
     ) {}
@@ -36,9 +35,14 @@ class CollectionItem extends AbstractModel {
             coverImage: self::getStringOrNull($data['basic_information'] ?? [], 'cover_image'),
             artists: self::mapModels($data['basic_information']['artists'] ?? [], Artist::class),
             rating: isset($data['rating']) ? (float)$data['rating'] : null,
-            fields: self::getArrayOrNull($data, 'notes'),
+            fields: self::mapModels($data['notes'] ?? [], FieldData::class),
             dateAdded: self::getStringOrNull($data, 'date_added'),
             resourceUrl: self::getStringOrNull($data, 'resource_url'),
         );
+    }
+
+    public function getFieldValue(int $fieldId): ?string
+    {
+        return array_find($this->fields, fn(FieldData $field) => $field->fieldId === $fieldId)?->value;
     }
 }
