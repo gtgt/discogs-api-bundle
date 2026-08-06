@@ -15,6 +15,7 @@ class CollectionItem extends AbstractModel {
     public function __construct(
         public readonly int $id,
         public readonly ?string $title,
+        public readonly ?int $folderId,
         public readonly array $formats,
         public readonly ?string $coverImage,
         public readonly array $artists,
@@ -31,6 +32,7 @@ class CollectionItem extends AbstractModel {
         return new self(
             id: $releaseId,
             title: self::getStringOrNull($data['basic_information'] ?? [], 'title'),
+            folderId: self::getIntOrNull($data, 'folder_id'),
             formats: self::mapModels($data['basic_information']['formats'] ?? [], Format::class),
             coverImage: self::getStringOrNull($data['basic_information'] ?? [], 'cover_image'),
             artists: self::mapModels($data['basic_information']['artists'] ?? [], Artist::class),
